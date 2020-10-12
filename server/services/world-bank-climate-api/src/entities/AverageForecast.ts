@@ -1,7 +1,7 @@
 import { Field, Int, ObjectType, Float } from 'type-graphql';
 
 @ObjectType()
-export default class AnnualAverageForecast {
+export default class AverageForecast {
   @Field()
   scenario: string;
 
@@ -11,10 +11,8 @@ export default class AnnualAverageForecast {
   @Field()
   toYear: string;
 
-
-  @Field(() => [Float])
-  annualVal: number[];
-
+  @Field(() => [Float], { nullable: true})
+  value: number[];
 
   @Field()
   percentile: number
