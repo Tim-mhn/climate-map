@@ -2,13 +2,13 @@ import { ApolloServer } from 'apollo-server-express';
 const express = require('express')
 import 'reflect-metadata';
 import { buildSchema } from 'type-graphql';
-import { AnnualAverageForecastResolver } from './resolvers/annualAverageFc';
+import { AverageForecastResolver } from './resolvers/averageForecastResolver';
+import { DerivedStatResolver } from './resolvers/derivedStatResolver';
 
-import UserResolver from './resolvers/userResolver';
 
 async function startServer() {
   const schema = await buildSchema({
-    resolvers: [AnnualAverageForecastResolver],
+    resolvers: [AverageForecastResolver, DerivedStatResolver],
     emitSchemaFile: true
   });
 

@@ -1,12 +1,10 @@
-import { timeStamp } from "console";
 import { Resolver, Query, Arg} from "type-graphql";
-import AnnualAverageForecast from "../entities/AverageForecast";
 import CountryForecast from "../entities/CountryForecast";
 const countrycodes = require('../help/countryCodes.json')
 const nodeFetch = require("node-fetch")
 
 @Resolver()
-export class AnnualAverageForecastResolver {
+export class AverageForecastResolver {
 
 
     @Query(() => [CountryForecast])
@@ -20,7 +18,7 @@ export class AnnualAverageForecastResolver {
         @Arg("test", { defaultValue: false}) test: boolean
     ) {
         let baseUrl = "http://climatedataapi.worldbank.org/climateweb/rest/v1/country/"
-        let url = `${baseUrl}${type}/ensemble/${percentile}/pr/${start}/${end}/`;
+        let url = `${baseUrl}${type}/ensemble/${percentile}/${variable}/${start}/${end}/`;
 
         // Get all codes if iso3 is null
         let countryCodes = iso3 ? (toArray(iso3)) : getCountryISOCodes();
@@ -34,7 +32,6 @@ export class AnnualAverageForecastResolver {
 
                 finalVals = finalVals.map((countryFcs: any, idx: number) => {
                     countryFcs = editKeyName(countryFcs);
-                    // AverageForecast(countryCodes[idx], countryFcs, type, variable)
                     return {"country": countryCodes[idx],  "data": countryFcs, "type": type, "variable": variable}
                 });
 
@@ -56,7 +53,6 @@ function editKeyName(countryFcs: any[]) {
         countryFcs.forEach((fc: any) => {
             const targetKey = Object.keys(fc).includes("monthVals") ? "monthVals" : "annualVal";
             fc["value"] = fc[targetKey];
-            console.log(fc);
             delete fc[targetKey];
         })
     }
