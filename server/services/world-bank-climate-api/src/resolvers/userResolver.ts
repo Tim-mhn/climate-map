@@ -7,7 +7,7 @@ import {
   Root
 } from 'type-graphql';
 import { UserData, users } from '../data';
-import User from '../schemas/User';
+import User from '../schemas/AnnualAverageForecast';
 import { UserInput } from './userInput';
 @Resolver(of => User)
 export default class {

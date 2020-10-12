@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --exec ts-node src/server.ts",
+    "dev": "nodemon --exec ts-node src/index.ts",
     "build": "tsc",
     "start": "node ./dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -16,6 +16,8 @@
     "@types/node-fetch": "^2.5.7",
     "apollo-server-express": "^2.9.13",
     "class-validator": "^0.11.0",
+    "country-list-js": "^3.1.7",
+    "countrycodes": "0.0.5",
     "reflect-metadata": "^0.1.13",
     "type-graphql": "^0.17.5"
   },
