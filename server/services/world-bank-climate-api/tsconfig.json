@@ -7,7 +7,7 @@
     "skipLibCheck": true,
     "moduleResolution": "node",
     "removeComments": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "outDir": "./dist",
     "strict": true,
     "strictPropertyInitialization": false,

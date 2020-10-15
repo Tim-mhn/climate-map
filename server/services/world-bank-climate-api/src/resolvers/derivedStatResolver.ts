@@ -1,5 +1,6 @@
 import { Resolver, Query, Arg} from "type-graphql";
 import CountryForecast from "../entities/CountryForecast";
+import { loadJson } from "../utils/http";
 // const countrycodes = require('../help/countryCodes.json')
 const nodeFetch = require("node-fetch")
 
@@ -7,9 +8,9 @@ const nodeFetch = require("node-fetch")
 export class DerivedStatResolver {
 
 
-    @Query(() => [CountryForecast])
+    @Query(() => CountryForecast)
     async hot_days(
-        @Arg("iso3", () => String, { defaultValue: null, nullable: true}) iso3: string[],
+        @Arg("iso3", () => String, { defaultValue: null, nullable: true}) iso3: string,
         @Arg("type", () => String, { defaultValue: 'annualavg'}) type: 'annualavg' | 'annualanom' ,
         @Arg("start") start: string,
         @Arg("end") end: string,
@@ -19,25 +20,14 @@ export class DerivedStatResolver {
         let baseUrl = "http://climatedataapi.worldbank.org/climateweb/rest/v1/country/"
         let url = `${baseUrl}${type}/ensemble/${percentile}/tmax_days90th/${start}/${end}/${iso3}`;
 
-        return nodeFetch(url)
-            .then((res: any) => {
-                console.log("before res json");
-                console.log(res.json());
-                console.log("after res json");
-                return res.json();
-            })
-            .then((body: any[]) => {
-                console.log("before edit key name");
-                // body = body.map(fc => editKeyName(fc));
-                console.log("after edit key name");
-                console.log(body);
-                return body;
-            })
-            .catch((err: Error) => {
-                console.error(`Error when fetching from ${url}: ${err}`);
-                return null;
-        })
-
+        try {
+            let data = await loadJson(url);
+            data = editKeyName(data);
+            return { "country": iso3, "data": data}
+        } catch (err) {
+            console.error(err);
+            return { "country": iso3, "data": null }
+        }
 
     }
 
