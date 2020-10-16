@@ -1,8 +1,8 @@
 import { Resolver, Query, Arg} from "type-graphql";
 import CountryForecast from "../entities/CountryForecast";
-const countrycodes = require('../help/countryCodes.json')
+import { getIsoCodes } from '../utils/isoCodes'
 const nodeFetch = require("node-fetch")
-import { ISOCodesFetcher } from "../help/isoCodes"
+
 @Resolver()
 export class AverageForecastResolver {
 
@@ -21,13 +21,13 @@ export class AverageForecastResolver {
         let url = `${baseUrl}${type}/ensemble/${percentile}/${variable}/${start}/${end}/`;
 
         // Get all codes if iso3 is null
-        let countryCodes = iso3 ? (toArray(iso3)) : await ISOCodesFetcher.getISO3Codes();
-        
+        let countryCodes: string[] = iso3 ? (toArray(iso3)) : await getIsoCodes();
+
         // Reduce query time when developing
         if (test) countryCodes = countryCodes.slice(0, 5);
 
-        let countryPromises = countryCodes.map((code: string) => createCountryPromise(url, code));
-
+        let countryPromises: Promise<any>[] = countryCodes.map((code: string) => createCountryPromise(url, code));
+        console.log(countryPromises.length);
         return Promise.all(countryPromises)
             .then((finalVals: any) => {
 
@@ -82,5 +82,7 @@ function toArray(obj: any) {
     /**
      * Return obj if obj is array otherwise [obj]
      */
+    console.log("to array called");
+    console.log(obj)
     return (typeof(obj) === typeof(["hello"])) ? obj : [obj];
 }

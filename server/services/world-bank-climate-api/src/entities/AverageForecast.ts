@@ -16,4 +16,5 @@ export default class AverageForecast {
 
   @Field()
   percentile: number
+
 }

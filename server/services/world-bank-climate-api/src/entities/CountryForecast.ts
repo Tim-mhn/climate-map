@@ -9,4 +9,7 @@ export default class CountryForecast {
   @Field(() => [AverageForecast], { nullable: true})
   data: AverageForecast[];
 
+  @Field(() => Float, { nullable: true})
+  ref?: number
+
 }
