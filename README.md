@@ -4,8 +4,10 @@ A world map to alert people on climate change consequences. Forecasts per countr
 
 Building this with :
 
-Server: Express, Typescript, GraphQL
+**Server:** **Express**, **Typescript**, **GraphQL**
+
 Front: 
+
 Deploy:
 
 [Public Trello](https://trello.com/b/Cb7wVbBb/kanban-template)
