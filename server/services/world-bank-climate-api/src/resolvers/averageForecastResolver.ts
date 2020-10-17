@@ -1,5 +1,5 @@
 import { Resolver, Query, Arg} from "type-graphql";
-import CountryForecast from "../entities/CountryForecast";
+import { CountryBaseForecast } from "../entities/CountryForecast";
 import { getIsoCodes } from '../utils/isoCodes'
 const nodeFetch = require("node-fetch")
 
@@ -7,7 +7,7 @@ const nodeFetch = require("node-fetch")
 export class AverageForecastResolver {
 
 
-    @Query(() => [CountryForecast])
+    @Query(() => [CountryBaseForecast])
     async forecasts(
         @Arg("iso3", () => [String], { defaultValue: null, nullable: true}) iso3: string[],
         @Arg("variable", () => String) variable: 'tas' | 'pr',

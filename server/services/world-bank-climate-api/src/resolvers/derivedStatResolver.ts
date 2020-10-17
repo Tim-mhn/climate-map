@@ -1,5 +1,7 @@
 import { Resolver, Query, Arg} from "type-graphql";
-import CountryForecast from "../entities/CountryForecast";
+import { CountryBaseForecast, CountryPrecipitationForecast } from "../entities/CountryForecast";
+import { AnnualForecast, MonthlyForecast } from "../models/interfaces";
+import { getMonthAnnualVal } from "../utils/forecast";
 import { loadJson } from "../utils/loadJson";
 const nodeFetch = require("node-fetch")
 
@@ -7,7 +9,7 @@ const nodeFetch = require("node-fetch")
 export class DerivedStatResolver {
 
 
-    @Query(() => CountryForecast)
+    @Query(() => CountryBaseForecast)
     async hot_days(
         @Arg("iso3", () => String, { defaultValue: null, nullable: true}) iso3: string,
         @Arg("type", () => String, { defaultValue: 'annualavg'}) type: 'annualavg' | 'annualanom' ,
@@ -30,37 +32,54 @@ export class DerivedStatResolver {
 
     }
 
-    @Query(() => CountryForecast)
-    async ppt_anom(
+    @Query(() => CountryPrecipitationForecast)
+    async daily_ppt_forecasts(
         @Arg("iso3", () => String, { defaultValue: null, nullable: true}) iso3: string,
-        @Arg("type", () => String, { defaultValue: 'annualavg'}) type: 'annualavg' | 'annualanom' ,
-        @Arg("start") start: string,
-        @Arg("end") end: string,
-        @Arg("percentile", { defaultValue: '50'}) percentile: '10' | '50' |'90' = '50',
+        @Arg("granulation", () => String, { defaultValue: 'year'}) granulation: 'year' | 'month' ,
     ) {
-        // Histotrical average monthly precipitation (mm) for each decade since 1900s
-        const historicalDailyPptUrl = `http://climatedataapi.worldbank.org/climateweb/rest/v1/country/cru/pr/decade/${iso3}`;
-        // Daily precipitation means anomaly prediction
-        const predPptAnomUrl = `http://climatedataapi.worldbank.org/climateweb/rest/v1/country/annualanom/ensemble/ppt_means/${start}/${end}/${iso3}`;
-        try {
-            let histPrecipitations: [ {"year": number, "data": number }] = await loadJson(historicalDailyPptUrl);
 
-            const ref = 1900;
-            const refDailyPpt = histPrecipitations.filter(v => v.year == ref)[0].data / 30; // Month average to day average
+        let requestType = granulation == "year" ? "annual" : "m";
+        const anom = requestType + "anom";
+        const avg = requestType + "avg";
+        // Precipitation Prediction urls (for year or month depending on granulation)
+        const pptPredUrl = (type: string, start: string, end: string) => `http://climatedataapi.worldbank.org/climateweb/rest/v1/country/${type}/ensemble/ppt_means/${start}/${end}/${iso3}`;
 
-            let pptAnomPredictions: [ { "scenario": string, "fromYear": number, "toYear": number, "annualVal": number[], "percentile": number}] = await loadJson(predPptAnomUrl);
-            // Keep absolute values and pass referece value to response -> more flexible
-            pptAnomPredictions.forEach(v => { v["value"] = [v["annualVal"][0]]; });
+        // Only time periods avaiable from API
+        const timePeriods = [ { "start" : "2046", "end": "2065"}, { "start" : "2081", "end": "2100"}]
 
-            return { "country": iso3, "data": pptAnomPredictions, "ref" : refDailyPpt};
-        } catch (err) {
-            console.error(err);
-            return { "country": iso3, "data": null }
+
+        let forecasts: any[] = [];
+        for (let yearPair of timePeriods) {
+            try {
+                // const t = AnnualForecast
+                let averageFcs: [AnnualForecast | MonthlyForecast] = await loadJson(pptPredUrl(avg, yearPair.start, yearPair.end));
+                let annomalyFcs: [AnnualForecast | MonthlyForecast] = await loadJson(pptPredUrl(anom, yearPair.start, yearPair.end));
+
+                averageFcs.forEach(v => { v["avg"] = getMonthAnnualVal(v)} );
+
+                // Add anomaly prediction to each corresponding average forecast element (same percentile, scenario)
+                annomalyFcs.forEach(anomFc => {
+                    // Find matching element in average forecasts
+                    let matchingAvgForecast: any = averageFcs.find(fc => fc.percentile == anomFc.percentile && fc.scenario == anomFc.scenario);
+                    // Add anomaly predictions
+                    matchingAvgForecast["anom"] = getMonthAnnualVal(anomFc);
+                });
+
+                forecasts = forecasts.concat(averageFcs);
+
+            } catch (err) {
+                console.error(err);
+                forecasts.push({"fromYear": yearPair.start, "toYear": yearPair.end, "avg": null, "anom": null, "percentile": null, "error" : err.message});
+            }
         }
 
+        // True if all requests have generated an error
+        const globalError = forecasts.every(fc => "error" in fc);
+
+        const response: CountryPrecipitationForecast = { "country" : iso3, "data": forecasts, "error": globalError ? forecasts[0]["error"] : undefined };
+        return response
     }
 
-   
 
 
 

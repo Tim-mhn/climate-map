@@ -17,4 +17,7 @@ export default class AverageForecast {
   @Field()
   percentile: number
 
+  @Field(() => String, { nullable: true})
+  error: string;
+
 }
