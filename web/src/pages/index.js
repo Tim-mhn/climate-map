@@ -23,6 +23,8 @@ const Index = () => (
         Example repository of <Code>Next.js</Code> + <Code>chakra-UI</Code>.
       </Text>
 
+      <Text>Read <ChakraLink href="/post/first-post"><a>this page!</a></ChakraLink></Text>
+
       <List spacing={3} my={0}>
         <ListItem>
           <ListIcon icon="check-circle" color="green.500" />
@@ -46,7 +48,7 @@ const Index = () => (
 
     <DarkModeSwitch />
     <Footer>
-      <Text>Next ❤️ Chakra</Text>
+      <Text>Next ❤️ Chakra NO RELOAD</Text>
     </Footer>
     <CTA />
   </Container>
