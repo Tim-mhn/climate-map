@@ -7,6 +7,11 @@ const nodeFetch = require("node-fetch")
 export class AverageForecastResolver {
 
 
+    @Query(() => String)
+    async hello() {
+        return "hello world";
+    }
+    
     @Query(() => [CountryBaseForecast])
     async forecasts(
         @Arg("iso3", () => [String], { defaultValue: null, nullable: true}) iso3: string[],
