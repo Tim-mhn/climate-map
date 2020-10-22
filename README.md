@@ -6,7 +6,7 @@ Building this with :
 
 **Server:** **Express**, **Typescript**, **GraphQL**
 
-**Front: React, Next.js, Chakra-UI, URQL** 
+**Front: React, Next.js, Chakra-UI, URQL, React Vector Map** 
 
 Deploy:
 
