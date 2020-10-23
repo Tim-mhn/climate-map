@@ -1,5 +1,6 @@
-import { ReactVectorMap } from '../components/ReactVectorMap';
+// import { ReactVectorMap } from '../trash/ReactVectorMap';
+import { RMapGL } from '../components/ReactMapGL';
 
 export default () => {
-    return <ReactVectorMap/>;
+    return <RMapGL/>;
 };
