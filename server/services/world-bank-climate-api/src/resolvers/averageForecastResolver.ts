@@ -32,7 +32,7 @@ export class AverageForecastResolver {
         if (test) countryCodes = countryCodes.slice(0, 5);
 
         let countryPromises: Promise<any>[] = countryCodes.map((code: string) => createCountryPromise(url, code));
-        console.log(countryPromises.length);
+
         return Promise.all(countryPromises)
             .then((finalVals: any) => {
 
@@ -87,7 +87,5 @@ function toArray(obj: any) {
     /**
      * Return obj if obj is array otherwise [obj]
      */
-    console.log("to array called");
-    console.log(obj)
     return (typeof(obj) === typeof(["hello"])) ? obj : [obj];
 }

@@ -17,7 +17,7 @@ import { Footer } from '../components/Footer'
 // import dotenv from 'dotenv'
 
 // dotenv.config()
-import { Hello, Precipitations } from '../components/Queries'
+import { Hello, Temperatures } from '../components/Queries'
 
 
 const Index = () => (
@@ -29,7 +29,7 @@ const Index = () => (
       </Text>
 
       <Hello/>
-      <Precipitations/>
+      <Temperatures/>
 
       <Text>Read <ChakraLink href="/post/first-post"><a>this page!</a></ChakraLink></Text>
       <List spacing={3} my={0}>
