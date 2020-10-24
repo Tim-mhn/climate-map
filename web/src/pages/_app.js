@@ -1,29 +1,26 @@
 import { ThemeProvider, CSSReset, ColorModeProvider } from '@chakra-ui/core'
-import { createClient, Provider, useQuery } from 'urql';
+import { ApolloClient, InMemoryCache, ApolloProvider  } from '@apollo/client';
 import theme from '../theme'
 
-const client = createClient({ url: 'http://localhost:4000/graphql' });
 
-// const HelloQuery = `
-//   query {
-//     hello
-//   }
-// `;
-
+const client = new ApolloClient({
+  uri: 'http://localhost:4000/graphql',
+  cache: new InMemoryCache()
+});
 
 
 function MyApp({ Component, pageProps }) {
 
  
   return (
-    <Provider value={client}>
+    <ApolloProvider client={client}>
     <ThemeProvider theme={theme}>
       <ColorModeProvider>
         <CSSReset />
         <Component {...pageProps} />
       </ColorModeProvider>
     </ThemeProvider>
-    </Provider>
+    </ApolloProvider >
   )
 }
 

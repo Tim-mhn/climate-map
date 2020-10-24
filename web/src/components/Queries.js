@@ -1,28 +1,12 @@
-import { useQuery } from 'urql';
+import { HelloQuery } from '../graphql/queries/HelloQuery';
+import { TemperatureQuery } from '../graphql/queries/TemperatureQuery';
+import { gql, useQuery } from '@apollo/client';
 
-const HelloQuery = `
-  query {
-    hello
-  }
-`;
-
-const PrecipitationsQuery = `
-  query {
-      daily_ppt_forecasts(iso3: "fra", granulation: "month") {
-        data {scenario, avg}
-        country
-      }
-  }
-`;
 
 export const Hello = () => {
-  const [result, reexecuteQuery] = useQuery({
-    query: HelloQuery,
-  });
+  const { loading, error, data } = useQuery(HelloQuery);
 
-  const { data, fetching, error } = result;
-
-  if (fetching) return <p>Loading...</p>;
+  if (loading) return <p>Loading...</p>;
   if (error) return <p>Oh no... {error.message}</p>;
   console.log(data);
   return (
@@ -30,15 +14,19 @@ export const Hello = () => {
   );
 };
 
-export const Precipitations = () => {
-  const [result, reexecuteQuery] = useQuery({
-    query: PrecipitationsQuery,
+export const Temperatures = () => {
+
+  const start = "2020";
+  const end = "2039";
+  const { loading, error, data } = useQuery(TemperatureQuery,
+    { variables: { start, end }
   });
 
-  const { data, fetching, error } = result;
-
-  if (fetching) return <p>Loading...</p>;
-  if (error) return <p>Oh no... {error.message}</p>;
+  if (loading) return <p>Loading...</p>;
+  if (error) {
+    console.error(error);
+    return <p>Oh no... {error.message}</p>;
+  }
   console.log(data);
   return (
     <p>Success boy</p>
