@@ -1,6 +1,7 @@
+/* eslint-disable react/react-in-jsx-scope */
 import { HelloQuery } from '../graphql/queries/HelloQuery';
 import { TemperatureQuery } from '../graphql/queries/TemperatureQuery';
-import { gql, useQuery } from '@apollo/client';
+import {  useQuery } from '@apollo/client';
 
 
 export const Hello = () => {
