@@ -6,44 +6,16 @@ export const useGraphQL = (years, query) => {
     // const [years, setYears] = useState(initialYears);
 
 
-    console.log("Use GraphQL hook called !");
     const { loading, error, data } = useQuery(query, { variables: { ...years }});
-    const [component, setComponent] = useState(<p>Loading...</p>);
+    // const [component, setComponent] = useState(<p>Loading...</p>);
 
-    useEffect( () => {
-        var comp = data ? <p>Success</p> : <p>Loading or error ...</p>;
-        setComponent(comp);
-    }, [data])
+    // useEffect( () => {
+    //     console.log(data);
+    //     const comp = (loading || error) ? <p>Loading or error ...</p> : <p>Success</p> ;
+    //     setComponent(comp);
+    // }, [loading, error, data])
     
 
-    return  (
-        component
-    )
+    return  [loading, error, data]
     
-    
-    
-    // return [values, e => {
-    //     console.log("handle change called")
-    //     setValues({
-    //         ...values,
-    //         [e.target.name]: e.target.value
-    //     })
-    // }]
-
-
 }
-
-
-// const _loadTemperatureData = () => {
-//     const start = "2020";
-//     const end = "2039";
-//     const { loading, error, data } = useQuery(TemperatureQuery,
-//     { variables: { start, end }
-//     });
-
-//     if (data) console.log(data);
-//     else if(loading) console.info("loading")
-//     else console.error(error)
-
-//     getAllGeoJSONs().then(geojson => console.log(geojson));
-// }

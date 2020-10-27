@@ -4,10 +4,9 @@ import { Button } from "@chakra-ui/core";
 import { useQuery } from '@apollo/client';
 import { getAllGeoJSONs } from '../utils/geojson'
 import 'mapbox-gl/dist/mapbox-gl.css';
-import map from '../pages/map';
 import { TemperatureQuery } from '../graphql/queries/TemperatureQuery';
 import { useGraphQL } from '../hooks/useGraphQL';
-
+import { Select } from "@chakra-ui/core";
 
 export const RMapGL = () => {
 
@@ -19,60 +18,76 @@ export const RMapGL = () => {
             zoom: 1
         }
 
+    const [featuresCollection, setFeaturesCollection] = useState(null);
     const [viewport, setViewport] = useState(vp);
     const [data, setData] = useState(null);
     const [years, setYears] = useState({ start: "2020", end: "2039"});
-    const [queryResp, setQueryResp] = useState(<p>Loading</p>)
-    const queryRes = useGraphQL(years, TemperatureQuery);
-
-    // const { gqLoading, gqError, gqData } = useQuery(
-    //     TemperatureQuery, 
-    //     { variables: { ...years }});
-
-
-    // useEffect( () => {
-
-
-    //     console.log("Use Effect for GRAPHQL called")
-    //     setQueryResp(() => {
-    //         console.log(gqLoading, gqError, gqData )
-    //         if (gqError) return <p>Error :/</p>
-    //         if (!gqLoading && gqData) return <p>Success, query has been called !</p>
-    //         return <p>Loading</p>
-    //     });
-
-    // }, [gqLoading, gqError, gqData]);
-
+    const [scenario, setScenario] = useState("a2");
+    const [loading, error, gqData] = useGraphQL(years, TemperatureQuery);
+    
+    // Load GeoJSON data of all countries only on startup
+    useEffect( () => {
+        getAllGeoJSONs().then(geojsons => {
+            // setFeaturesCollection(geojsons);
+            setFeaturesCollection(_addTemperatureData(geojsons, gqData));
+        });
+    }, [gqData]);
  
 
+    // Update "reference" value for country colouring on scenario update
     useEffect( () => {
-        // this.loadTemperatureData();
+        console.log("Use effect on scenario update :");
+        if (featuresCollection) _updateColourRefValue(featuresCollection, "temperature", "scenario", scenario)
+    }, [scenario]);
+
+
+    useEffect( () => {
         console.log("Use effet called");
         fetch('https://raw.githubusercontent.com/uber/react-map-gl/master/examples/.data/us-income.geojson')
             .then(response => response.json())
             .then(res => {
-                console.log(res)
+                // console.log(res)
                 _loadData(res);
             })
             .catch(error => console.error(error))
 
     }, []);
 
-    // const _loadTemperatureData = () => {
-    //     const start = "2020";
-    //     const end = "2039";
-    //     const { loading, error, data } = useQuery(TemperatureQuery,
-    //     { variables: { start, end }
-    //     });
+    // Set the value used for country colour by looking into property 
+    // and finding the element that has field attribute = filterVal
+    const _updateColourRefValue = (featuresColl, property, field, filterVal) => {
+        // console.log(featuresColl)
+        const featuresWithRefVal = featuresColl.features.map(feature =>  {
+            let prop = feature.properties[property];
+            const refValue = prop ? prop.find(el => el[field] == filterVal) : 0;
 
-    //     if (data) console.log(data);
-    //     else if(loading) console.info("loading")
-    //     else console.error(error)
+            const updatedProperties = { ...feature.properties, "value": refValue };
+            
+          
+            return { ...feature, "properties": updatedProperties }
+        });
 
-    //     getAllGeoJSONs().then(geojson => console.log(geojson));
-    // }
+        const updatedFeaturesColl =  { ...featuresColl, "features": featuresWithRefVal};
+        console.log(updatedFeaturesColl);
+        setFeaturesCollection(updatedFeaturesColl);
+    }
 
-    // _loadTemperatureData();
+    const _addTemperatureData = (featuresColl, temperatureData) => {
+        const featuresWithTemperature = featuresColl.features.map(feature =>  {
+            let prop = feature.properties;
+            const iso3 = prop.ISO_A3;
+            const countryForecast = temperatureData ? temperatureData.forecasts.find(fc => fc.country == iso3) : null;
+            
+            prop = { ...prop, "temperature": countryForecast ? countryForecast.data : null };
+          
+            return { ...feature, "properties": prop }
+        });
+
+
+        console.log(featuresWithTemperature)
+
+        return { ...featuresColl, "features": featuresWithTemperature }
+    }
 
     const _loadData = (data) => {
         console.log(data);
@@ -84,14 +99,8 @@ export const RMapGL = () => {
         console.log('Update colours called!');
         // const { data } = this.state;
         const year = Math.floor(Math.random() * 10) + 2000;
-        getAllGeoJSONs().then(geojson => console.log(geojson));
         setData(_mapData(data, year))
-    }
-
-    const _updateYearsRandom = () => {
-        const early = Math.random() > 0.5;
-        console.log("update years random called");
-        setYears({start: early ? "2020" : "2040", end: early ? "2039" : "2059"});
+        console.log(_addTemperatureData(featuresCollection, gqData));
     }
 
 
@@ -109,18 +118,14 @@ export const RMapGL = () => {
             return { ...f, properties };
         });
 
-        const res = {
+        return {
             'type': "FeatureCollection",
             'features': mappedFeatures
         }
-        // console.log(`_mapData called with`);
-        // console.log(res);
-        return res;
     }
 
 
 
-    // _onViewportChange = viewport => setState({ viewport });
     const Map = () => {
 
 
@@ -136,14 +141,14 @@ export const RMapGL = () => {
                     property: 'value',
                     stops: [
                         [0, '#3288bd'],
-                        [0.1, '#66c2a5'],
-                        [.2, '#abdda4'],
-                        [.3, '#e6f598'],
-                        [.4, '#ffffbf'],
-                        [.5, '#fee08b'],
-                        [.6, '#fdae61'],
-                        [.7, '#f46d43'],
-                        [.8, '#d53e4f']
+                        [3, '#66c2a5'],
+                        [6, '#abdda4'],
+                        [9, '#e6f598'],
+                        [12, '#ffffbf'],
+                        [15, '#fee08b'],
+                        [18, '#fdae61'],
+                        [21, '#f46d43'],
+                        [24, '#d53e4f']
                     ]
                 },
                 'fill-opacity': 0.8
@@ -162,13 +167,21 @@ export const RMapGL = () => {
                     // onClick={() => _loadTemperatureData()}
                     mapboxApiAccessToken={TOKEN}>
 
-                    <Source type="geojson" data={data}>
+                    <Source type="geojson" data={featuresCollection}>
                         <Layer {...dataLayer}></Layer>
                     </Source>
                 </ReactMapGL>
                 <Button variantColor="green" onClick={() => _updateColours()}>Update colours</Button>
-                <Button variantColor="blue" onClick={() => _updateYearsRandom()}>Update years random</Button>
-                { queryResp }
+                {/* <Button variantColor="blue" onClick={() => _updateYearsRandom()}>Update years random</Button> */}
+                <Select 
+                    placeholder="Select scenario" 
+                    defaultValue="a2"
+                    onChange={(select) => setScenario(select.target.value)}                    
+                >
+                    <option value="a2">a2</option>
+                    <option value="b1">b1</option>
+                </Select>
+                <p>{gqData ? "Data" : "No data"} </p>
             </div>
 
         );
