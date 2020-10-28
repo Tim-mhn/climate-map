@@ -11,3 +11,4 @@ Building this with :
 Deploy:
 
 [Public Trello](https://trello.com/b/Cb7wVbBb/kanban-template)
+[Built wireframe with Balsamiq](https://balsamiq.cloud/sj3epi0/pdvn82j)
