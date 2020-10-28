@@ -14,3 +14,17 @@ query Temperatures($start: String!, $end: String!) {
       }
   }
 }`
+
+export const PrecipitationQuery = gql`
+query Temperatures($start: String!, $end: String!) {
+    forecasts(test: true, percentile: "50", start: $start, end: $end, type: "annualavg", variable: "pr") { 
+  		country, 
+    	data {
+            scenario
+            value
+            fromYear
+            toYear
+            percentile
+      }
+  }
+}`

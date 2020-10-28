@@ -4,9 +4,11 @@ import { Button } from "@chakra-ui/core";
 import { useQuery } from '@apollo/client';
 import { getAllGeoJSONs } from '../utils/geojson'
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { TemperatureQuery } from '../graphql/queries/TemperatureQuery';
+import { TemperatureQuery, PrecipitationQuery } from '../graphql/queries/ForecastsQueries';
 import { useGraphQL } from '../hooks/useGraphQL';
 import { Select } from "@chakra-ui/core";
+import { useForm } from '../hooks/useForm';
+import { updateFeaturesCollection } from '../utils/featuresCollection';
 
 export const RMapGL = () => {
 
@@ -20,47 +22,41 @@ export const RMapGL = () => {
 
     const [featuresCollection, setFeaturesCollection] = useState(null);
     const [viewport, setViewport] = useState(vp);
-    const [data, setData] = useState(null);
-    const [years, setYears] = useState({ start: "2020", end: "2039"});
-    const [scenario, setScenario] = useState("a2");
-    const [loading, error, gqData] = useGraphQL(years, TemperatureQuery);
+    const [input, setInput] = useForm({ start: "2020", end: "2039", scenario: "a2", variable: "temperature"});
+
+    // Fetch Temperature + Precipitation data
+    // TODO: factorize these 2 as it doubles the number of useEffect called right below
+    const [tLoading, tError, tData] = useGraphQL({ start: "2020", end: "2039", query: TemperatureQuery});
+    const [prLoading, prError, prData] = useGraphQL({ start: "2020", end: "2039", query: PrecipitationQuery});
+
     
     // Load GeoJSON data of all countries only on startup
     useEffect( () => {
         getAllGeoJSONs().then(geojsons => {
             // setFeaturesCollection(geojsons);
-            setFeaturesCollection(_addTemperatureData(geojsons, gqData));
+            let updatedFeatures = updateFeaturesCollection(geojsons, tData, "temperature");
+            updatedFeatures = updateFeaturesCollection(updatedFeatures, prData, "precipitation");
+            setFeaturesCollection(updatedFeatures);
         });
-    }, [gqData]);
+    }, [tData, prData]);
  
 
     // Update "reference" value for country colouring on scenario update
     useEffect( () => {
-        console.log("Use effect on scenario update :");
-        if (featuresCollection) _updateColourRefValue(featuresCollection, "temperature", "scenario", scenario)
-    }, [scenario]);
+        console.count("Use effect on scenario update :");
+        if (featuresCollection) _updateColourRefValue(featuresCollection, input.variable, "scenario", input.scenario)
+    }, [input]);
 
-
-    useEffect( () => {
-        console.log("Use effet called");
-        fetch('https://raw.githubusercontent.com/uber/react-map-gl/master/examples/.data/us-income.geojson')
-            .then(response => response.json())
-            .then(res => {
-                // console.log(res)
-                _loadData(res);
-            })
-            .catch(error => console.error(error))
-
-    }, []);
 
     // Set the value used for country colour by looking into property 
     // and finding the element that has field attribute = filterVal
     const _updateColourRefValue = (featuresColl, property, field, filterVal) => {
-        // console.log(featuresColl)
+        console.count("update colour ref value called")
         const featuresWithRefVal = featuresColl.features.map(feature =>  {
             let prop = feature.properties[property];
-            const refValue = prop ? prop.find(el => el[field] == filterVal) : 0;
-
+            let refValue = prop ? prop.find(el => el[field] == filterVal).value[0] : 0;
+            refValue += Math.random() * 10;
+            if (prop) console.log("One prop found")
             const updatedProperties = { ...feature.properties, "value": refValue };
             
           
@@ -68,62 +64,8 @@ export const RMapGL = () => {
         });
 
         const updatedFeaturesColl =  { ...featuresColl, "features": featuresWithRefVal};
-        console.log(updatedFeaturesColl);
         setFeaturesCollection(updatedFeaturesColl);
     }
-
-    const _addTemperatureData = (featuresColl, temperatureData) => {
-        const featuresWithTemperature = featuresColl.features.map(feature =>  {
-            let prop = feature.properties;
-            const iso3 = prop.ISO_A3;
-            const countryForecast = temperatureData ? temperatureData.forecasts.find(fc => fc.country == iso3) : null;
-            
-            prop = { ...prop, "temperature": countryForecast ? countryForecast.data : null };
-          
-            return { ...feature, "properties": prop }
-        });
-
-
-        console.log(featuresWithTemperature)
-
-        return { ...featuresColl, "features": featuresWithTemperature }
-    }
-
-    const _loadData = (data) => {
-        console.log(data);
-        setData(_mapData(data));
-    };
-
-
-    const _updateColours = () => {
-        console.log('Update colours called!');
-        // const { data } = this.state;
-        const year = Math.floor(Math.random() * 10) + 2000;
-        setData(_mapData(data, year))
-        console.log(_addTemperatureData(featuresCollection, gqData));
-    }
-
-
-    const _mapData = (data, year="2000") => {
-
-        const { features } = data;
-
-        const mappedFeatures = features.map(f => {
-            const val = f.properties.income[year] / 60000;
-            const properties = {
-                ...f.properties,
-                "value": val
-            }
-
-            return { ...f, properties };
-        });
-
-        return {
-            'type': "FeatureCollection",
-            'features': mappedFeatures
-        }
-    }
-
 
 
     const Map = () => {
@@ -172,16 +114,27 @@ export const RMapGL = () => {
                     </Source>
                 </ReactMapGL>
                 <Button variantColor="green" onClick={() => _updateColours()}>Update colours</Button>
-                {/* <Button variantColor="blue" onClick={() => _updateYearsRandom()}>Update years random</Button> */}
+
                 <Select 
                     placeholder="Select scenario" 
                     defaultValue="a2"
-                    onChange={(select) => setScenario(select.target.value)}                    
+                    onChange={setInput}                    
                 >
                     <option value="a2">a2</option>
                     <option value="b1">b1</option>
                 </Select>
-                <p>{gqData ? "Data" : "No data"} </p>
+
+                <Select 
+                    placeholder="Select variable" 
+                    defaultValue="temperature"
+                    onChange={setInput}                    
+                >
+                    <option value="precipitation">Precipitation</option>
+                    <option value="temperature">Temperature</option>
+                </Select>
+
+
+                <p>{tData ? "Data" : "No data"} </p>
             </div>
 
         );

@@ -1,12 +1,12 @@
 import React, { useEffect, useState} from "react"
 import { useQuery } from '@apollo/client';
-import { TemperatureQuery } from '../graphql/queries/TemperatureQuery';
+import { TemperatureQuery } from '../graphql/queries/ForecastsQueries';
 
-export const useGraphQL = (years, query) => {
+export const useGraphQL = ({ start, end, query}) => {
     // const [years, setYears] = useState(initialYears);
 
 
-    const { loading, error, data } = useQuery(query, { variables: { ...years }});
+    const { loading, error, data } = useQuery(query, { variables: { start, end }});
     // const [component, setComponent] = useState(<p>Loading...</p>);
 
     // useEffect( () => {

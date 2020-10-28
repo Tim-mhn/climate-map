@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { TemperatureQuery } from '../graphql/queries/TemperatureQuery';
+import { TemperatureQuery } from '../graphql/queries/ForecastsQueries';
 
 export async function getAllGeoJSONs() {
     const geoJsonURL = "https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson"
