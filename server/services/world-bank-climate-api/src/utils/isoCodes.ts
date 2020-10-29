@@ -1,17 +1,17 @@
 import { loadJson } from "./loadJson";
 
 
+const ISO3_ENDPOINTS = "http://countries.petethompson.net/data/countries.json"
+
 let iso3Codes: string[] = [];
 
 async function fetchIsoCodes(): Promise<boolean> {
     /**
      * Fetch list of all codes from public api and update attribute
      */
-    const endpoint = "http://countries.petethompson.net/data/countries.json"
-
     console.count("Fetch iso codes called !")
     try {
-        let data: any[] = await loadJson(endpoint);
+        let data: any[] = await loadJson(ISO3_ENDPOINTS);
         iso3Codes = data.map(val => val['cca3']);
         return true
     } catch (err) {

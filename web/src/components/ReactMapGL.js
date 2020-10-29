@@ -1,37 +1,39 @@
-import React, { useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactMapGL, { Source, Layer } from 'react-map-gl';
-import { Button } from "@chakra-ui/core";
-import { useQuery } from '@apollo/client';
-import { getAllGeoJSONs } from '../utils/geojson'
-import 'mapbox-gl/dist/mapbox-gl.css';
-import { TemperatureQuery, PrecipitationQuery } from '../graphql/queries/ForecastsQueries';
-import { useGraphQL } from '../hooks/useGraphQL';
 import { Select } from "@chakra-ui/core";
-import { useForm } from '../hooks/useForm';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import { getAllGeoJSONs } from '../utils/geojson'
+import { TemperatureQuery, PrecipitationQuery } from '../graphql/queries/ForecastsQueries';
+import { useGraphQL } from '../hooks/graphql';
+import { useForm } from '../hooks/form';
 import { updateFeaturesCollection } from '../utils/featuresCollection';
-
+import DiscreteSlider from './DiscreteSlider';
+import { _useFetchAllTemperatures } from '../hooks/fetch';
 export const RMapGL = () => {
 
     const vp = {
-            width: 1600,
-            height: 800,
-            latitude: 37.7577,
-            longitude: -122.4376,
-            zoom: 1
-        }
+        width: 1600,
+        height: 800,
+        latitude: 37.7577,
+        longitude: -122.4376,
+        zoom: 1
+    }
 
     const [featuresCollection, setFeaturesCollection] = useState(null);
     const [viewport, setViewport] = useState(vp);
-    const [input, setInput] = useForm({ start: "2020", end: "2039", scenario: "a2", variable: "temperature"});
+    const [input, setInput] = useForm({ start: "2020", end: "2039", scenario: "a2", variable: "temperature" });
 
     // Fetch Temperature + Precipitation data
     // TODO: factorize these 2 as it doubles the number of useEffect called right below
-    const [tLoading, tError, tData] = useGraphQL({ start: "2020", end: "2039", query: TemperatureQuery});
-    const [prLoading, prError, prData] = useGraphQL({ start: "2020", end: "2039", query: PrecipitationQuery});
+    const [tLoading, tError, tData] = useGraphQL(TemperatureQuery, { start: "2020", end: "2039" });
+    const [prLoading, prError, prData] = useGraphQL(PrecipitationQuery, { start: "2020", end: "2039" });
+    const allData = _useFetchAllTemperatures();
 
-    
+    const [sliderval, setSliderVal] = useState(7);
+
+
     // Load GeoJSON data of all countries only on startup
-    useEffect( () => {
+    useEffect(() => {
         getAllGeoJSONs().then(geojsons => {
             // setFeaturesCollection(geojsons);
             let updatedFeatures = updateFeaturesCollection(geojsons, tData, "temperature");
@@ -39,11 +41,12 @@ export const RMapGL = () => {
             setFeaturesCollection(updatedFeatures);
         });
     }, [tData, prData]);
- 
+
 
     // Update "reference" value for country colouring on scenario update
-    useEffect( () => {
+    useEffect(() => {
         console.count("Use effect on scenario update :");
+        console.log(input)
         if (featuresCollection) _updateColourRefValue(featuresCollection, input.variable, "scenario", input.scenario)
     }, [input]);
 
@@ -52,22 +55,42 @@ export const RMapGL = () => {
     // and finding the element that has field attribute = filterVal
     const _updateColourRefValue = (featuresColl, property, field, filterVal) => {
         console.count("update colour ref value called")
-        const featuresWithRefVal = featuresColl.features.map(feature =>  {
+        const featuresWithRefVal = featuresColl.features.map(feature => {
             let prop = feature.properties[property];
             let refValue = prop ? prop.find(el => el[field] == filterVal).value[0] : 0;
             refValue += Math.random() * 10;
             if (prop) console.log("One prop found")
             const updatedProperties = { ...feature.properties, "value": refValue };
-            
-          
+
+
             return { ...feature, "properties": updatedProperties }
         });
 
-        const updatedFeaturesColl =  { ...featuresColl, "features": featuresWithRefVal};
+        const updatedFeaturesColl = { ...featuresColl, "features": featuresWithRefVal };
         setFeaturesCollection(updatedFeaturesColl);
     }
 
-
+    // const marks  = [
+    //     {
+    //       value: 0,
+    //       label: '0°C',
+    //     },
+    //     {
+    //       value: 30,
+    //       label: '20°C',
+      
+    //     },
+    //     {
+    //       value: 66,
+    //       label: '37°C',
+      
+    //     },
+    //     {
+    //       value: 100,
+    //       label: '1000°C',
+      
+    //     },
+    //   ];
     const Map = () => {
 
 
@@ -93,7 +116,7 @@ export const RMapGL = () => {
                         [24, '#d53e4f']
                     ]
                 },
-                'fill-opacity': 0.8
+                'fill-opacity': 0.95
             }
         };
 
@@ -113,28 +136,29 @@ export const RMapGL = () => {
                         <Layer {...dataLayer}></Layer>
                     </Source>
                 </ReactMapGL>
-                <Button variantColor="green" onClick={() => _updateColours()}>Update colours</Button>
 
-                <Select 
-                    placeholder="Select scenario" 
+                <Select
+                    name="scenario"
+                    placeholder="Select scenario"
                     defaultValue="a2"
-                    onChange={setInput}                    
+                    onChange={setInput}
                 >
                     <option value="a2">a2</option>
                     <option value="b1">b1</option>
                 </Select>
 
-                <Select 
-                    placeholder="Select variable" 
+                <Select
+                    name="variable"
+                    placeholder="Select variable"
                     defaultValue="temperature"
-                    onChange={setInput}                    
+                    onChange={setInput}
                 >
                     <option value="precipitation">Precipitation</option>
                     <option value="temperature">Temperature</option>
                 </Select>
 
+                {/* <DiscreteSlider marks={marks}/> */}
 
-                <p>{tData ? "Data" : "No data"} </p>
             </div>
 
         );
