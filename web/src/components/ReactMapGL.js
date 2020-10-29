@@ -8,7 +8,11 @@ import { useGraphQL } from '../hooks/graphql';
 import { useForm } from '../hooks/form';
 import { updateFeaturesCollection } from '../utils/featuresCollection';
 import DiscreteSlider from './DiscreteSlider';
-import { _useFetchAllTemperatures } from '../hooks/fetch';
+import { useFetchAll } from '../hooks/fetch';
+import { BASIC_REQ_TIME_PERIODS } from '../utils/constants';
+import { stripIgnoredCharacters } from 'graphql';
+
+
 export const RMapGL = () => {
 
     const vp = {
@@ -21,13 +25,15 @@ export const RMapGL = () => {
 
     const [featuresCollection, setFeaturesCollection] = useState(null);
     const [viewport, setViewport] = useState(vp);
-    const [input, setInput] = useForm({ start: "2020", end: "2039", scenario: "a2", variable: "temperature" });
+    const [input, setInput] = useForm({ fromYear: "2020", scenario: "a2", variable: "temperature" });
 
     // Fetch Temperature + Precipitation data
-    // TODO: factorize these 2 as it doubles the number of useEffect called right below
-    const [tLoading, tError, tData] = useGraphQL(TemperatureQuery, { start: "2020", end: "2039" });
-    const [prLoading, prError, prData] = useGraphQL(PrecipitationQuery, { start: "2020", end: "2039" });
-    const allData = _useFetchAllTemperatures();
+    const { temperature, precipitation } = useFetchAll();
+    const [tLoading, tError, tData] = temperature;
+    const [prLoading, prError, prData] = precipitation;
+
+
+    // console.log(tData)
 
     const [sliderval, setSliderVal] = useState(7);
 
@@ -47,17 +53,26 @@ export const RMapGL = () => {
     useEffect(() => {
         console.count("Use effect on scenario update :");
         console.log(input)
-        if (featuresCollection) _updateColourRefValue(featuresCollection, input.variable, "scenario", input.scenario)
+        if (featuresCollection) _updateColourRefValue(featuresCollection, input)
     }, [input]);
 
 
     // Set the value used for country colour by looking into property 
     // and finding the element that has field attribute = filterVal
-    const _updateColourRefValue = (featuresColl, property, field, filterVal) => {
+    const _updateColourRefValue = (featuresColl, input) => {
         console.count("update colour ref value called")
         const featuresWithRefVal = featuresColl.features.map(feature => {
-            let prop = feature.properties[property];
-            let refValue = prop ? prop.find(el => el[field] == filterVal).value[0] : 0;
+            console.log(feature.properties);
+            console.log(input)
+            let prop = feature.properties[input.variable];
+            
+            const filter = (({ variable, ...o }) => o)(input) // Copy all key, values into filter except for "variable"
+
+
+            console.log(prop);
+            // Find first element that matches all values in input (scenario, fromYear, ...)
+            let refValue = prop ? prop.find(el => Object.keys(filter).every(key => el[key] == filter[key])).value[0] : 0;
+
             refValue += Math.random() * 10;
             if (prop) console.log("One prop found")
             const updatedProperties = { ...feature.properties, "value": refValue };
@@ -70,27 +85,7 @@ export const RMapGL = () => {
         setFeaturesCollection(updatedFeaturesColl);
     }
 
-    // const marks  = [
-    //     {
-    //       value: 0,
-    //       label: '0°C',
-    //     },
-    //     {
-    //       value: 30,
-    //       label: '20°C',
-      
-    //     },
-    //     {
-    //       value: 66,
-    //       label: '37°C',
-      
-    //     },
-    //     {
-    //       value: 100,
-    //       label: '1000°C',
-      
-    //     },
-    //   ];
+
     const Map = () => {
 
 
@@ -122,7 +117,11 @@ export const RMapGL = () => {
 
         // const { viewport, data } = this.state;
 
-        // this._loadGraphQLData();
+        const sliderOnChangeCommited = (_, start) => {
+            // start = start.toString();
+            // setInput({...input, "start": start, "end": getEndFromStart(start)});
+            console.log(start);
+        }
 
         return (
             <div style={{ height: '100%', position: 'relative' }}>
@@ -157,7 +156,10 @@ export const RMapGL = () => {
                     <option value="temperature">Temperature</option>
                 </Select>
 
-                {/* <DiscreteSlider marks={marks}/> */}
+                <DiscreteSlider 
+                    name="fromYear"
+                    handleChange={setInput} 
+                    />
 
             </div>
 

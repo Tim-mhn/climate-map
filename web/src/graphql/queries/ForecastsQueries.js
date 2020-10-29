@@ -28,3 +28,33 @@ query Precipitations($start: String!, $end: String!) {
       }
   }
 }`
+
+export const AlltimeTemperatureQuery = gql`
+query AlltimeTemperatures {
+    alltime_forecasts(test: true, percentile: "50", type: "annualavg", variable: "tas") { 
+  		country, 
+    	data {
+            scenario
+            value
+            fromYear
+            toYear
+            percentile
+      },
+      error
+  }
+}`
+
+export const AlltimePrecipitationQuery = gql`
+query AlltimePrecipitations {
+    alltime_forecasts(test: true, percentile: "50", type: "annualavg", variable: "pr") { 
+  		country, 
+    	data {
+            scenario
+            value
+            fromYear
+            toYear
+            percentile
+      },
+      error
+  }
+}`

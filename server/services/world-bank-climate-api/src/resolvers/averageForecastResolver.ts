@@ -76,17 +76,17 @@ export class AverageForecastResolver {
 
         // Reduce query time when developing
         if (test) countryCodes = countryCodes.slice(1, 4);
-        console.log(countryCodes)
 
         let countryPromises: Promise<any[]>[] = countryCodes.map((code: string) => createAlltimeCountryPromise(url, code));
 
         return Promise.all(countryPromises)
             .then((finalVals: any) => {
-
+                console.log(finalVals)
                 finalVals = finalVals.map((countryFcs: any, idx: number) => {
-                    countryFcs = editKeyName(countryFcs);
-                    const err = typeof(countryFcs) == typeof("string") ? countryFcs : null;
-                    return {"country": countryCodes[idx],  "data": countryFcs, "type": type, "variable": variable, "error": err}
+                    const success = typeof(countryFcs) != typeof("string");
+                    const errorMsg = success ? null : countryFcs;
+                    countryFcs = success ? editKeyName(countryFcs) : null;
+                    return {"country": countryCodes[idx],  "data": countryFcs, "type": type, "variable": variable, "error": errorMsg}
                 });
 
                 return finalVals;
@@ -129,13 +129,12 @@ function createCountryPromise(url: string, code: string) {
     return nodeFetch(`${url}${code}`)
         .then((res: any) => res.json())
         .catch((err: Error) => {
-            // console.error(`Error when fetching from ${url}/${code}: ${err}`);
             const errorMsg = `Error when fetching from ${url}${code}`
             return errorMsg ;
         })
 }
 
-function createAlltimeCountryPromise(url: string, code: string): Promise<any[]> {
+function createAlltimeCountryPromise(url: string, code: string): Promise<any[]  > {
     /**
      *  Create a promise for each country to handle bad requests (like for Antarticta) and return null in that case
      *  Inputs: base url and iso3 country code
@@ -147,7 +146,17 @@ function createAlltimeCountryPromise(url: string, code: string): Promise<any[]> 
     })
 
     return Promise.all(countryAlltimePromises)
-        .then((countryAlltimeRes: any[][]) => _flatten(countryAlltimeRes))
+        .then((countryAlltimeRes: any[][]) => {
+            // if (countryAlltimeRes.every(res => res instanceof String)) return null
+            const successfulRes = countryAlltimeRes.filter(res => typeof(res) != "string");
+            if (successfulRes.length > 0) return _flatten(successfulRes);
+            const firstErrorMsg = countryAlltimeRes[0];
+            console.log("country all time res")
+            console.log(countryAlltimeRes)
+            console.log(successfulRes)
+
+            return firstErrorMsg;
+        })
         .catch((error) => {
             console.error(`Erorr on create all time country promises ${error}`);
             return [];

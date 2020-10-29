@@ -9,7 +9,6 @@ export async function getAllGeoJSONs() {
       .then(json => {
           return json;
       })
-      .then(json => _mapData(json))
       .catch(err => {
           console.error(err);
           return { "data": null, "error": err};
@@ -17,8 +16,4 @@ export async function getAllGeoJSONs() {
     return data;
 }
 
-
-function _mapData(data) {
-    return data;
-}
 
