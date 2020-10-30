@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import ReactMapGL, { Source, Layer } from 'react-map-gl';
 import { Select } from "@chakra-ui/core";
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -24,33 +24,9 @@ export const RMapGL = () => {
     }
 
 
-    const iniDataLayer = { 
-        id: 'data',
-        type: 'fill',
-        paint: {
-            'fill-color': {
-                property: 'value',
-                stops: [
-                    [0, '#ffd6d6'],
-                    [3, '#f9fddc'],
-                    [6, '#d3ffd1'],
-                    [9, '#ccfbff'],
-                    [12, '#ded0ff'],
-                    [15, '#f0a824'],
-                    [18, '#ca9465'],
-                    [21, '#8e5c49'],
-                    [24, '#55362a']
-                ],
-            
-            },
-            'fill-opacity': 0.95
-        }
-    };
-
-
     const [featuresCollection, setFeaturesCollection] = useState(null);
     const [viewport, setViewport] = useState(iniViewport);
-    const [dataLayer, setDataLayer] = useState(iniDataLayer);
+    // const [dataLayer, setDataLayer] = useState(iniDataLayer);
     const [input, setInput] = useForm({ fromYear: "2020", scenario: "a2", variable: "temperature" });
 
     // Fetch Temperature + Precipitation data
@@ -72,40 +48,47 @@ export const RMapGL = () => {
 
     // Update "reference" value for country colouring on scenario update
     useEffect(() => {
-        console.count("Use effect on scenario update :");
-        console.log(input)
         if (featuresCollection) _updateColourRefValue(featuresCollection, input)
     }, [input]);
 
-    // Update data layer colour steps on features collection update
-    useEffect( ()  => {
-        console.log(featuresCollection);
+    // Update styles data layer on features collection update
+    const dataLayer = useMemo( ()  => {
+        const colours = ["#8e5c49", "#ca9465", "#f0a824", "#ded0ff", "#ccfbff", 
+        "#d3ffd1", "#f9fddc", "#ffd6d6", "#55362a"];
+        const dataLayer = { 
+            id: 'data',
+            type: 'fill',
+            paint: {
+                'fill-color': {
+                    property: 'value',
+                    stops: [[0, "#000000"]]
+                },
+                'fill-opacity': 0.95
+            }
+        };
+
         if (featuresCollection) {
+            
+
             let allValues = featuresCollection.features.map(f => f.properties.value);
             allValues = allValues.filter(x => x != 0);
             const max = Math.max(...allValues);
             const min = Math.min(...allValues);
-            
+            const step = (max-min)/(colours.length-1);
 
-            let newStops = dataLayer.paint["fill-color"].stops;
-            const step = (max-min)/(newStops.length-1);
+            const stops = colours.map((c, idx) => [(min+step*idx), c]);
 
-            newStops = newStops.map((val, idx) => [min + step*idx, val[1]]);
-            dataLayer.paint["fill-color"].stops = newStops;
-            console.log(dataLayer);
-            console.log(allValues);
-            setDataLayer(dataLayer);
-
-
-
+            dataLayer.paint['fill-color'].stops = stops;
+            console.log(dataLayer)            
         }
+
+        return dataLayer
     }, [featuresCollection])
 
 
     // Set the value used for country colour by looking into property 
     // and finding the element that has field attribute = filterVal
     const _updateColourRefValue = (featuresColl, input) => {
-        console.count("update colour ref value called")
         const featuresWithRefVal = featuresColl.features.map(feature => {
             let prop = feature.properties[input.variable];
             
@@ -115,7 +98,6 @@ export const RMapGL = () => {
             let refValue = prop ? prop.find(el => Object.keys(filter).every(key => el[key] == filter[key])).value[0] : 0;
 
             // refValue += Math.random() * 10;
-            if (prop) console.log("One prop found")
             const updatedProperties = { ...feature.properties, "value": refValue };
 
 
@@ -123,6 +105,7 @@ export const RMapGL = () => {
         });
 
         const updatedFeaturesColl = { ...featuresColl, "features": featuresWithRefVal };
+        console.log("Features collection updated after input update");
         console.log(updatedFeaturesColl)
         setFeaturesCollection(updatedFeaturesColl);
     }
