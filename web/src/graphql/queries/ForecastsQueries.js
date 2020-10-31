@@ -3,7 +3,7 @@ import { gql, useQuery } from '@apollo/client';
 
 export const TemperatureQuery = gql`
 query Temperatures($start: String!, $end: String!) {
-    forecasts(test: true, percentile: "50", start: $start, end: $end, type: "annualavg", variable: "tas") { 
+    forecasts(test: false, percentile: "50", start: $start, end: $end, type: "annualavg", variable: "tas") { 
   		country, 
     	data {
             scenario
@@ -17,7 +17,7 @@ query Temperatures($start: String!, $end: String!) {
 
 export const PrecipitationQuery = gql`
 query Precipitations($start: String!, $end: String!) {
-    forecasts(test: true, percentile: "50", start: $start, end: $end, type: "annualavg", variable: "pr") { 
+    forecasts(test: false, percentile: "50", start: $start, end: $end, type: "annualavg", variable: "pr") { 
   		country, 
     	data {
             scenario
@@ -31,7 +31,7 @@ query Precipitations($start: String!, $end: String!) {
 
 export const AlltimeTemperatureQuery = gql`
 query AlltimeTemperatures {
-    alltime_forecasts(test: true, percentile: "50", type: "annualavg", variable: "tas") { 
+    alltime_forecasts(test: false, percentile: "50", type: "annualavg", variable: "tas") { 
   		country, 
     	data {
             scenario
@@ -46,7 +46,7 @@ query AlltimeTemperatures {
 
 export const AlltimePrecipitationQuery = gql`
 query AlltimePrecipitations {
-    alltime_forecasts(test: true, percentile: "50", type: "annualavg", variable: "pr") { 
+    alltime_forecasts(test: false, percentile: "50", type: "annualavg", variable: "pr") { 
   		country, 
     	data {
             scenario

@@ -2,6 +2,7 @@ import { loadJson } from "./loadJson";
 
 
 const ISO3_ENDPOINTS = "http://countries.petethompson.net/data/countries.json"
+const MIN_RELEVANCE = 1;
 
 let iso3Codes: string[] = [];
 
@@ -12,7 +13,10 @@ async function fetchIsoCodes(): Promise<boolean> {
     console.count("Fetch iso codes called !")
     try {
         let data: any[] = await loadJson(ISO3_ENDPOINTS);
-        iso3Codes = data.map(val => val['cca3']);
+        const relevant: any[] = data.filter(v => +v.relevance >= MIN_RELEVANCE);
+        // console.log(relevant.map(v => v.name.common));  
+        iso3Codes = relevant.map(val => val['cca3']);
+
         return true
     } catch (err) {
         console.error(err);

@@ -79,7 +79,8 @@ export const RMapGL = () => {
             const stops = colours.map((c, idx) => [(min+step*idx), c]);
 
             dataLayer.paint['fill-color'].stops = stops;
-            console.log(dataLayer)            
+            console.log(dataLayer);
+            console.log(featuresCollection)            
         }
 
         return dataLayer
@@ -95,7 +96,7 @@ export const RMapGL = () => {
             const filter = (({ variable, ...o }) => o)(input) // Copy all key, values into filter except for "variable"
 
             // Find first element that matches all values in input (scenario, fromYear, ...)
-            let refValue = prop ? prop.find(el => Object.keys(filter).every(key => el[key] == filter[key])).value[0] : 0;
+            let refValue = prop ? prop.find(el => Object.keys(filter).every(key => el[key] == filter[key])).value[0] : null;
 
             // refValue += Math.random() * 10;
             const updatedProperties = { ...feature.properties, "value": refValue };
@@ -105,8 +106,6 @@ export const RMapGL = () => {
         });
 
         const updatedFeaturesColl = { ...featuresColl, "features": featuresWithRefVal };
-        console.log("Features collection updated after input update");
-        console.log(updatedFeaturesColl)
         setFeaturesCollection(updatedFeaturesColl);
     }
 

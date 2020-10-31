@@ -76,12 +76,11 @@ export class AverageForecastResolver {
 
         // Reduce query time when developing
         if (test) countryCodes = countryCodes.slice(1, 10);
-
+        
         let countryPromises: Promise<any[]>[] = countryCodes.map((code: string) => createAlltimeCountryPromise(url, code));
 
         return Promise.all(countryPromises)
             .then((finalVals: any) => {
-                console.log(finalVals)
                 finalVals = finalVals.map((countryFcs: any, idx: number) => {
                     const success = typeof(countryFcs) != typeof("string");
                     const errorMsg = success ? null : countryFcs;
@@ -126,10 +125,17 @@ function createCountryPromise(url: string, code: string) {
      *  Create a promise for each country to handle bad requests (like for Antarticta) and return null in that case
      *  Inputs: base url and iso3 country code
      */
+    console.log(`Creating country pomise for ${code}`)
     return nodeFetch(`${url}${code}`)
         .then((res: any) => res.json())
+        .then(data => {
+            // console.log(code);
+            // if (code.toLowerCase() == "can") console.log(data);
+            return data;
+        })
         .catch((err: Error) => {
-            const errorMsg = `Error when fetching from ${url}${code}`
+            const errorMsg = `Error when fetching from ${url}${code}`;
+            console.error(errorMsg);
             return errorMsg ;
         })
 }
@@ -151,9 +157,6 @@ function createAlltimeCountryPromise(url: string, code: string): Promise<any[]  
             const successfulRes = countryAlltimeRes.filter(res => typeof(res) != "string");
             if (successfulRes.length > 0) return _flatten(successfulRes);
             const firstErrorMsg = countryAlltimeRes[0];
-            console.log("country all time res")
-            console.log(countryAlltimeRes)
-            console.log(successfulRes)
 
             return firstErrorMsg;
         })
