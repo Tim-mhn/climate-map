@@ -3,14 +3,11 @@ import ReactMapGL, { Source, Layer } from 'react-map-gl';
 import { Select } from "@chakra-ui/core";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { getAllGeoJSONs } from '../utils/geojson'
-import { TemperatureQuery, PrecipitationQuery } from '../graphql/queries/ForecastsQueries';
-import { useGraphQL } from '../hooks/graphql';
 import { useForm } from '../hooks/form';
 import { updateFeaturesCollection } from '../utils/featuresCollection';
 import DiscreteSlider from './DiscreteSlider';
 import { useFetchAll } from '../hooks/fetch';
-import { BASIC_REQ_TIME_PERIODS } from '../utils/constants';
-import { stripIgnoredCharacters } from 'graphql';
+import { DATA_LAYER_STOPS, DATA_LAYER_COLOURS } from '../utils/constants';
 
 
 export const RMapGL = () => {
@@ -25,8 +22,8 @@ export const RMapGL = () => {
 
 
     const [featuresCollection, setFeaturesCollection] = useState(null);
+    const [iniColourRender, setIniColourRender] = useState(0);
     const [viewport, setViewport] = useState(iniViewport);
-    // const [dataLayer, setDataLayer] = useState(iniDataLayer);
     const [input, setInput] = useForm({ fromYear: "2020", scenario: "a2", variable: "temperature" });
 
     // Fetch Temperature + Precipitation data
@@ -37,24 +34,31 @@ export const RMapGL = () => {
 
     // Load GeoJSON data of all countries only on startup
     useEffect(() => {
-        getAllGeoJSONs().then(geojsons => {
-            // setFeaturesCollection(geojsons);
-            let updatedFeatures = updateFeaturesCollection(geojsons, tData, "temperature");
-            updatedFeatures = updateFeaturesCollection(updatedFeatures, prData, "precipitation");
-            setFeaturesCollection(updatedFeatures);
-        });
+        if (tData && prData) {
+            getAllGeoJSONs().then(geojsons => {
+                console.log("Use effect calling to update features collection");
+                console.log(tData);
+                console.log(prData);
+
+                let updatedFeatures = updateFeaturesCollection(geojsons, tData, "temperature");
+                updatedFeatures = updateFeaturesCollection(updatedFeatures, prData, "precipitation");
+                setFeaturesCollection(updatedFeatures);
+                console.log("updated features collection:")
+                console.log(featuresCollection);
+                console.log(updatedFeatures);
+                setIniColourRender(iniColourRender+1);
+            });
+        }
     }, [tData, prData]);
 
 
-    // Update "reference" value for country colouring on scenario update
+    // Update "reference" value for country colouring on scenario update in featuresCollection
     useEffect(() => {
         if (featuresCollection) _updateColourRefValue(featuresCollection, input)
-    }, [input]);
+    }, [iniColourRender, input]);
 
     // Update styles data layer on features collection update
     const dataLayer = useMemo( ()  => {
-        const colours = ["#8e5c49", "#ca9465", "#f0a824", "#ded0ff", "#ccfbff", 
-        "#d3ffd1", "#f9fddc", "#ffd6d6", "#55362a"];
         const dataLayer = { 
             id: 'data',
             type: 'fill',
@@ -67,16 +71,21 @@ export const RMapGL = () => {
             }
         };
 
+        console.log("useMemo data layer called");
+        console.log(featuresCollection)
+
         if (featuresCollection) {
             
 
-            let allValues = featuresCollection.features.map(f => f.properties.value);
-            allValues = allValues.filter(x => x != 0);
-            const max = Math.max(...allValues);
-            const min = Math.min(...allValues);
-            const step = (max-min)/(colours.length-1);
-
-            const stops = colours.map((c, idx) => [(min+step*idx), c]);
+            
+            let stops = DATA_LAYER_STOPS[input.variable];
+            // Assert that stops and colours have same number of elements !
+            if (stops.length != DATA_LAYER_COLOURS.length) {
+                console.error(stops);
+                console.error(stops.length)
+                throw Error(`Error in updating data layer paint. Stops and colours don't have same length ${DATA_LAYER_STOPS} --- ${DATA_LAYER_COLOURS}`);
+            }
+            stops = stops.map((st, idx) => [st, DATA_LAYER_COLOURS[idx]]);
 
             dataLayer.paint['fill-color'].stops = stops;
             console.log(dataLayer);
@@ -84,12 +93,13 @@ export const RMapGL = () => {
         }
 
         return dataLayer
-    }, [featuresCollection])
+    }, [featuresCollection]);
 
 
     // Set the value used for country colour by looking into property 
     // and finding the element that has field attribute = filterVal
     const _updateColourRefValue = (featuresColl, input) => {
+        console.log("updating colour ref value")
         const featuresWithRefVal = featuresColl.features.map(feature => {
             let prop = feature.properties[input.variable];
             
@@ -107,6 +117,8 @@ export const RMapGL = () => {
 
         const updatedFeaturesColl = { ...featuresColl, "features": featuresWithRefVal };
         setFeaturesCollection(updatedFeaturesColl);
+        console.log("udpated features coll from update coloru ref");
+        console.log(updatedFeaturesColl)
     }
 
 

@@ -69,14 +69,14 @@ export class AverageForecastResolver {
     ) {
         let baseUrl = "http://climatedataapi.worldbank.org/climateweb/rest/v1/country/"
         let url = `${baseUrl}${type}/ensemble/${percentile}/${variable}/`;
-        // start}/end}/;
+        console.count(`All time forecasts called ! with args: ${iso3} ${variable} ${percentile} ${type}`)
 
         // Get all codes if iso3 is null
         let countryCodes: string[] = iso3 ? (toArray(iso3)) : await getIsoCodes();
 
         // Reduce query time when developing
         if (test) countryCodes = countryCodes.slice(1, 10);
-        
+
         let countryPromises: Promise<any[]>[] = countryCodes.map((code: string) => createAlltimeCountryPromise(url, code));
 
         return Promise.all(countryPromises)
@@ -125,14 +125,13 @@ function createCountryPromise(url: string, code: string) {
      *  Create a promise for each country to handle bad requests (like for Antarticta) and return null in that case
      *  Inputs: base url and iso3 country code
      */
-    console.log(`Creating country pomise for ${code}`)
     return nodeFetch(`${url}${code}`)
         .then((res: any) => res.json())
-        .then(data => {
-            // console.log(code);
-            // if (code.toLowerCase() == "can") console.log(data);
-            return data;
-        })
+        // .then(data => {
+        //     // console.log(code);
+        //     // if (code.toLowerCase() == "can") console.log(data);
+        //     return data;
+        // })
         .catch((err: Error) => {
             const errorMsg = `Error when fetching from ${url}${code}`;
             console.error(errorMsg);
