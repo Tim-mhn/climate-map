@@ -37,6 +37,7 @@ type PrecipitationForecast {
 type Query {
   hello: String!
   forecasts(test: Boolean = false, percentile: String = "50", end: String!, start: String!, type: String = "annualavg", variable: String!, iso3: [String!] = null): [CountryBaseForecast!]!
+  alltime_forecasts(test: Boolean = false, percentile: String = "50", type: String = "annualavg", variable: String!, iso3: [String!] = null): [CountryBaseForecast!]!
   hot_days(test: Boolean = false, percentile: String = "50", end: String!, start: String!, type: String = "annualavg", iso3: String = null): CountryBaseForecast!
   daily_ppt_forecasts(granulation: String = "year", iso3: String = null): CountryPrecipitationForecast!
 }

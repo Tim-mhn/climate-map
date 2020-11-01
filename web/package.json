@@ -12,6 +12,7 @@
     "@chakra-ui/core": "^0.5.2",
     "@emotion/core": "^10.0.27",
     "@emotion/styled": "^10.0.27",
+    "@material-ui/core": "^4.11.0",
     "@south-paw/react-vector-maps": "^3.0.0",
     "datamaps": "^0.5.9",
     "dotenv": "^8.2.0",
@@ -23,5 +24,10 @@
     "react-jvectormap": "0.0.16",
     "react-map-gl": "^5.2.9"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^7.12.0",
+    "eslint-plugin-react": "^7.21.5",
+    "eslint-plugin-react-hooks": "^4.2.0"
+  }
 }

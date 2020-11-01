@@ -8,7 +8,7 @@ export class CountryBaseForecast {
   country: string;
 
   @Field(() => [AverageForecast], { nullable: true})
-  data: AverageForecast[];
+  data?: AverageForecast[];
 
   @Field(() => String, { nullable: true})
   error: string;
