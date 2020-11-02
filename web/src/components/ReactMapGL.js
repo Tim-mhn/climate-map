@@ -3,13 +3,13 @@ import ReactMapGL, { Source, Layer } from 'react-map-gl';
 import { Select } from "@chakra-ui/core";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Grid from '@material-ui/core/Grid';  
+import Grid from '@material-ui/core/Grid';
 import { getAllGeoJSONs } from '../utils/geojson'
 import { useForm } from '../hooks/form';
 import { updateFeaturesCollection } from '../utils/featuresCollection';
 import DiscreteSlider from './DiscreteSlider';
 import { useFetchAll } from '../hooks/fetch';
-import { DATA_LAYER_STOPS, DATA_LAYER_COLOURS } from '../utils/constants';
+import { DATA_LAYER_STOPS, DATA_LAYER_COLOURS, BASIC_REQ_TIME_PERIODS, MONTHS } from '../utils/constants';
 
 
 export const RMapGL = () => {
@@ -26,7 +26,7 @@ export const RMapGL = () => {
     const [featuresCollection, setFeaturesCollection] = useState(null);
     const [iniColourRender, setIniColourRender] = useState(0);
     const [viewport, setViewport] = useState(iniViewport);
-    const [input, setInput] = useForm({ fromYear: "2020", scenario: "a2", variable: "temperature" });
+    const [input, setInput] = useForm({ fromYear: "2020", scenario: "a2", variable: "temperature", granulation: "year", "month": 0 });
 
     // Fetch Temperature + Precipitation data
     const { temperature, precipitation } = useFetchAll();
@@ -41,7 +41,7 @@ export const RMapGL = () => {
                 let updatedFeatures = updateFeaturesCollection(geojsons, tData, "temperature");
                 updatedFeatures = updateFeaturesCollection(updatedFeatures, prData, "precipitation");
                 setFeaturesCollection(updatedFeatures);
-                setIniColourRender(iniColourRender+1);
+                setIniColourRender(iniColourRender + 1);
             });
         }
     }, [tData, prData]);
@@ -53,8 +53,8 @@ export const RMapGL = () => {
     }, [iniColourRender, input]);
 
     // Update styles data layer on features collection update
-    const dataLayer = useMemo( ()  => {
-        const dataLayer = { 
+    const dataLayer = useMemo(() => {
+        const dataLayer = {
             id: 'data',
             type: 'fill',
             paint: {
@@ -67,9 +67,9 @@ export const RMapGL = () => {
         };
 
         if (featuresCollection) {
-            
 
-            
+
+
             let stops = DATA_LAYER_STOPS[input.variable];
             // Assert that stops and colours have same number of elements !
             if (stops.length != DATA_LAYER_COLOURS.length) {
@@ -92,11 +92,22 @@ export const RMapGL = () => {
         console.log("updating colour ref value")
         const featuresWithRefVal = featuresColl.features.map(feature => {
             let prop = feature.properties[input.variable];
-            
-            const filter = (({ variable, ...o }) => o)(input) // Copy all key, values into filter except for "variable"
+            const refKey = input.granulation == "year" ? "annualVal" : "monthVals"
 
+            const filter = (({ variable, granulation, month, ...o }) => o)(input) // Copy all key, values into filter except for "variable"
+
+            const idx = input.granulation == "year" ? 0 : input.month
             // Find first element that matches all values in input (scenario, fromYear, ...)
-            let refValue = prop ? prop.find(el => Object.keys(filter).every(key => el[key] == filter[key])).value[0] : null;
+            let refValue;
+            try {
+                refValue = prop ? prop.find(el => Object.keys(filter).every(key => el[key] == filter[key]))[refKey][idx] : null;
+            } catch (e) {
+                console.error(e);
+                console.log(prop);
+                console.log(filter);
+                console.log(refKey);
+                refValue = null;
+            }
 
             // refValue += Math.random() * 10;
             const updatedProperties = { ...feature.properties, "value": refValue };
@@ -110,48 +121,43 @@ export const RMapGL = () => {
     }
 
 
-    
+    const periodMarks = Object.entries(BASIC_REQ_TIME_PERIODS).map(([start, end]) => {
+        return { label: `${start}-${end}`, value: Number.parseInt(start) }
+    });
+
+    const monthMarks = MONTHS.map((month, idx) => { return { "value": idx, "label": month } });
+
     const Map = () => {
 
 
 
         var TOKEN = "pk.eyJ1IjoidGltaG4iLCJhIjoiY2tnbW1pZ2czMDVwYTJ1cXBkZzJjcXMxaCJ9.UNBlavlP3hhSmT5f7DRdBA"
-        // const useStyles = makeStyles((theme) => ({
-        //     root: {
-        //       display: 'flex',
-        //       '& > * + *': {
-        //         marginLeft: theme.spacing(5),
-        //       },
-        //     },
-        //   }));
-        // const loaderStyles = useStyles();
 
         return (
             <div style={{ height: '100%', position: 'relative' }}>
-                { tData && prData ? 
+                { tData && prData ?
                     <ReactMapGL
                         {...viewport}
                         onViewportChange={(vp) => setViewport(vp)}
-                        // onClick={() => _loadTemperatureData()}
                         mapboxApiAccessToken={TOKEN}>
 
                         <Source type="geojson" data={featuresCollection}>
                             <Layer {...dataLayer}></Layer>
                         </Source>
-                    </ReactMapGL> 
+                    </ReactMapGL>
                     : <Grid
-                    container
-                    direction="row"
-                    justify="center"
-                    alignItems="center"
-                    style={{height: iniViewport.height, width: iniViewport.width}}
-                        >
-                        <CircularProgress 
+                        container
+                        direction="row"
+                        justify="center"
+                        alignItems="center"
+                        style={{ height: iniViewport.height, width: iniViewport.width }}
+                    >
+                        <CircularProgress
                             size={100}
-                            />
-                        </Grid>
-                    }
-                
+                        />
+                    </Grid>
+                }
+
 
                 <Select
                     name="scenario"
@@ -172,11 +178,40 @@ export const RMapGL = () => {
                     <option value="precipitation">Precipitation</option>
                     <option value="temperature">Temperature</option>
                 </Select>
+                    <Select
+                        name="granulation"
+                        placeholder="Select granulation"
+                        defaultValue="year"
+                        onChange={setInput}
+                    >
+                        <option value="year">Year</option>
+                        <option value="month">Month</option>
+                    </Select>
 
-                <DiscreteSlider 
+                    
+                
+
+
+                <DiscreteSlider
+                    label="Period"
                     name="fromYear"
-                    handleChange={setInput} 
+                    handleChange={setInput}
+                    marks={periodMarks}
+                />
+                {
+                    input.granulation == "month" ?
+
+                    <DiscreteSlider
+                        label="Month"
+                        name="month"
+                        handleChange={setInput}
+                        marks={monthMarks}
                     />
+
+                    :
+
+                    <span></span>
+                }
 
             </div>
 

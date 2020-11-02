@@ -11,31 +11,11 @@ const useStyles = makeStyles({
   },
 });
 
-const marks = [
-  {
-    value: 2020,
-    label: '2020-2039',
-  },
-  {
-    value: 2040,
-    label: '2040-2059',
-
-  },
-  {
-    value: 2060,
-    label: '2060-2079',
-
-  },
-  {
-    value: 2080,
-    label: '2080-2099',
-
-  },
-];
 
 
 
-export default function DiscreteSlider({handleChange, name}) {
+
+export default function DiscreteSlider({label, handleChange, name, marks}) {
   const classes = useStyles();
 
   function valuetext(value) {
@@ -47,16 +27,19 @@ export default function DiscreteSlider({handleChange, name}) {
       return m ? m.label : "error";
   }
 
+  const _max = marks.reduce((prev, curr) => prev > curr.value ? prev : curr.value, -Number.MAX_VALUE);
+  const _min = marks.reduce((prev, curr) => prev < curr.value ? prev : curr.value, Number.MAX_VALUE);
+
 
   return (
     <div className={classes.root}>
       <Typography id="discrete-slider-restrict" gutterBottom>
-        Restricted values
+        {label}
       </Typography>
       <Slider
         // value={value}
-        min={2020}
-        max={2100}
+        min={_min}
+        max={_max}
         valueLabelFormat={valueLabelFormat}
         getAriaValueText={valuetext}
         aria-labelledby="discrete-slider-restrict"
@@ -65,7 +48,7 @@ export default function DiscreteSlider({handleChange, name}) {
         name={name}
         onChangeCommitted={(_, v) => {
           const event = { "target": { "name": name, "value": v.toString()} };
-          handleChange(event);
+          if (handleChange) handleChange(event);
           }}
         marks={marks}
       />

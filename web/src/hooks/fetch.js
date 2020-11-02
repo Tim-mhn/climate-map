@@ -3,8 +3,10 @@ import { AlltimePrecipitationQuery, AlltimeTemperatureQuery } from "../graphql/q
 
 
 export function useFetchAll() {
-    const [tLoading, tError, tData] = useGraphQL(AlltimeTemperatureQuery);
-    const [pLoading, pError, pData] = useGraphQL(AlltimePrecipitationQuery);
+    const [tLoading, tError, tData] = useGraphQL(AlltimeTemperatureQuery, { type: "mavg" });
+    const [pLoading, pError, pData] = useGraphQL(AlltimePrecipitationQuery, { type: "mavg" });
+
+    // const [l, e, d] = useGraphQL(AlltimePrecipitationQuery, { type: "mavg" });
 
     return {
         "temperature": [tLoading, tError, tData],
