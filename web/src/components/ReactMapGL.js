@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import ReactMapGL, { Source, Layer } from 'react-map-gl';
 import { Select } from "@chakra-ui/core";
 import 'mapbox-gl/dist/mapbox-gl.css';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Grid from '@material-ui/core/Grid';  
 import { getAllGeoJSONs } from '../utils/geojson'
 import { useForm } from '../hooks/form';
 import { updateFeaturesCollection } from '../utils/featuresCollection';
@@ -36,16 +38,9 @@ export const RMapGL = () => {
     useEffect(() => {
         if (tData && prData) {
             getAllGeoJSONs().then(geojsons => {
-                console.log("Use effect calling to update features collection");
-                console.log(tData);
-                console.log(prData);
-
                 let updatedFeatures = updateFeaturesCollection(geojsons, tData, "temperature");
                 updatedFeatures = updateFeaturesCollection(updatedFeatures, prData, "precipitation");
                 setFeaturesCollection(updatedFeatures);
-                console.log("updated features collection:")
-                console.log(featuresCollection);
-                console.log(updatedFeatures);
                 setIniColourRender(iniColourRender+1);
             });
         }
@@ -71,9 +66,6 @@ export const RMapGL = () => {
             }
         };
 
-        console.log("useMemo data layer called");
-        console.log(featuresCollection)
-
         if (featuresCollection) {
             
 
@@ -88,8 +80,6 @@ export const RMapGL = () => {
             stops = stops.map((st, idx) => [st, DATA_LAYER_COLOURS[idx]]);
 
             dataLayer.paint['fill-color'].stops = stops;
-            console.log(dataLayer);
-            console.log(featuresCollection)            
         }
 
         return dataLayer
@@ -117,35 +107,51 @@ export const RMapGL = () => {
 
         const updatedFeaturesColl = { ...featuresColl, "features": featuresWithRefVal };
         setFeaturesCollection(updatedFeaturesColl);
-        console.log("udpated features coll from update coloru ref");
-        console.log(updatedFeaturesColl)
     }
 
 
-
+    
     const Map = () => {
 
 
 
         var TOKEN = "pk.eyJ1IjoidGltaG4iLCJhIjoiY2tnbW1pZ2czMDVwYTJ1cXBkZzJjcXMxaCJ9.UNBlavlP3hhSmT5f7DRdBA"
-
-        // const geoJsonData = this.getUSGeoJson();
-        
-
-        // const { viewport, data } = this.state;
+        // const useStyles = makeStyles((theme) => ({
+        //     root: {
+        //       display: 'flex',
+        //       '& > * + *': {
+        //         marginLeft: theme.spacing(5),
+        //       },
+        //     },
+        //   }));
+        // const loaderStyles = useStyles();
 
         return (
             <div style={{ height: '100%', position: 'relative' }}>
-                <ReactMapGL
-                    {...viewport}
-                    onViewportChange={(vp) => setViewport(vp)}
-                    // onClick={() => _loadTemperatureData()}
-                    mapboxApiAccessToken={TOKEN}>
+                { tData && prData ? 
+                    <ReactMapGL
+                        {...viewport}
+                        onViewportChange={(vp) => setViewport(vp)}
+                        // onClick={() => _loadTemperatureData()}
+                        mapboxApiAccessToken={TOKEN}>
 
-                    <Source type="geojson" data={featuresCollection}>
-                        <Layer {...dataLayer}></Layer>
-                    </Source>
-                </ReactMapGL>
+                        <Source type="geojson" data={featuresCollection}>
+                            <Layer {...dataLayer}></Layer>
+                        </Source>
+                    </ReactMapGL> 
+                    : <Grid
+                    container
+                    direction="row"
+                    justify="center"
+                    alignItems="center"
+                    style={{height: iniViewport.height, width: iniViewport.width}}
+                        >
+                        <CircularProgress 
+                            size={100}
+                            />
+                        </Grid>
+                    }
+                
 
                 <Select
                     name="scenario"
