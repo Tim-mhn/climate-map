@@ -3,7 +3,7 @@ import ReactMapGL, { Source, Layer } from 'react-map-gl';
 import { Select } from "@chakra-ui/core";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Grid from '@material-ui/core/Grid';  
+import Grid from '@material-ui/core/Grid';
 import { getAllGeoJSONs } from '../utils/geojson'
 import { useForm } from '../hooks/form';
 import { updateFeaturesCollection } from '../utils/featuresCollection';
@@ -41,7 +41,7 @@ export const RMapGL = () => {
                 let updatedFeatures = updateFeaturesCollection(geojsons, tData, "temperature");
                 updatedFeatures = updateFeaturesCollection(updatedFeatures, prData, "precipitation");
                 setFeaturesCollection(updatedFeatures);
-                setIniColourRender(iniColourRender+1);
+                setIniColourRender(iniColourRender + 1);
             });
         }
     }, [tData, prData]);
@@ -53,8 +53,8 @@ export const RMapGL = () => {
     }, [iniColourRender, input]);
 
     // Update styles data layer on features collection update
-    const dataLayer = useMemo( ()  => {
-        const dataLayer = { 
+    const dataLayer = useMemo(() => {
+        const dataLayer = {
             id: 'data',
             type: 'fill',
             paint: {
@@ -67,9 +67,9 @@ export const RMapGL = () => {
         };
 
         if (featuresCollection) {
-            
 
-            
+
+
             let stops = DATA_LAYER_STOPS[input.variable];
             // Assert that stops and colours have same number of elements !
             if (stops.length != DATA_LAYER_COLOURS.length) {
@@ -122,11 +122,11 @@ export const RMapGL = () => {
 
 
     const periodMarks = Object.entries(BASIC_REQ_TIME_PERIODS).map(([start, end]) => {
-        return { label: `${start}-${end}`, value: Number.parseInt(start)}
-       });
+        return { label: `${start}-${end}`, value: Number.parseInt(start) }
+    });
 
-    const monthMarks = MONTHS.map((month, idx) => { return { "value": idx, "label": month}});
-    
+    const monthMarks = MONTHS.map((month, idx) => { return { "value": idx, "label": month } });
+
     const Map = () => {
 
 
@@ -135,7 +135,7 @@ export const RMapGL = () => {
 
         return (
             <div style={{ height: '100%', position: 'relative' }}>
-                { tData && prData ? 
+                { tData && prData ?
                     <ReactMapGL
                         {...viewport}
                         onViewportChange={(vp) => setViewport(vp)}
@@ -144,20 +144,20 @@ export const RMapGL = () => {
                         <Source type="geojson" data={featuresCollection}>
                             <Layer {...dataLayer}></Layer>
                         </Source>
-                    </ReactMapGL> 
+                    </ReactMapGL>
                     : <Grid
-                    container
-                    direction="row"
-                    justify="center"
-                    alignItems="center"
-                    style={{height: iniViewport.height, width: iniViewport.width}}
-                        >
-                        <CircularProgress 
+                        container
+                        direction="row"
+                        justify="center"
+                        alignItems="center"
+                        style={{ height: iniViewport.height, width: iniViewport.width }}
+                    >
+                        <CircularProgress
                             size={100}
-                            />
-                        </Grid>
-                    }
-                
+                        />
+                    </Grid>
+                }
+
 
                 <Select
                     name="scenario"
@@ -178,28 +178,38 @@ export const RMapGL = () => {
                     <option value="precipitation">Precipitation</option>
                     <option value="temperature">Temperature</option>
                 </Select>
+                    <Select
+                        name="granulation"
+                        placeholder="Select granulation"
+                        defaultValue="year"
+                        onChange={setInput}
+                    >
+                        <option value="year">Year</option>
+                        <option value="month">Month</option>
+                    </Select>
 
-                <Select
-                    name="granulation"
-                    placeholder="Select granulation"
-                    defaultValue="year"
-                    onChange={setInput}
-                >
-                    <option value="year">Year</option>
-                    <option value="month">Month</option>
-                </Select>
+                    
+                
 
-                <DiscreteSlider 
+
+                <DiscreteSlider
                     name="fromYear"
                     handleChange={setInput}
                     marks={periodMarks}
+                />
+                {
+                    input.granulation == "month" ?
+
+                    <DiscreteSlider
+                        name="month"
+                        handleChange={setInput}
+                        marks={monthMarks}
                     />
 
-                <DiscreteSlider 
-                    name="month"
-                    handleChange={setInput}
-                    marks={monthMarks}
-                    />
+                    :
+
+                    <span></span>
+                }
 
             </div>
 
