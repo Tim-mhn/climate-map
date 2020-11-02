@@ -193,6 +193,7 @@ export const RMapGL = () => {
 
 
                 <DiscreteSlider
+                    label="Period"
                     name="fromYear"
                     handleChange={setInput}
                     marks={periodMarks}
@@ -201,6 +202,7 @@ export const RMapGL = () => {
                     input.granulation == "month" ?
 
                     <DiscreteSlider
+                        label="Month"
                         name="month"
                         handleChange={setInput}
                         marks={monthMarks}

@@ -15,7 +15,7 @@ const useStyles = makeStyles({
 
 
 
-export default function DiscreteSlider({handleChange, name, marks}) {
+export default function DiscreteSlider({label, handleChange, name, marks}) {
   const classes = useStyles();
 
   function valuetext(value) {
@@ -34,7 +34,7 @@ export default function DiscreteSlider({handleChange, name, marks}) {
   return (
     <div className={classes.root}>
       <Typography id="discrete-slider-restrict" gutterBottom>
-        Restricted values
+        {label}
       </Typography>
       <Slider
         // value={value}
