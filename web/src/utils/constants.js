@@ -7,8 +7,8 @@ export const BASIC_REQ_TIME_PERIODS = {
 };
 
 export const MONTHS = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "Jan", "Feb", "Mar", "Ap", "May", "Jun",
+    "Jul", "Au", "Sep", "Oc", "Nov", "Dec"
 ];
 
 // Time periods allowed for start, end dates in climate API ensembled derived statistics requests
@@ -22,4 +22,6 @@ export const DATA_LAYER_STOPS = {
     "precipitation": [300, 600, 900, 1200, 1500, 1800, 2100, 2400, 2700, 3000]
 };
 export const DATA_LAYER_COLOURS = ["#00FF7F", "#27dc54", "#3BCA6D", "#77945C", "#818a77", "#B25F4A", "#ED2938", "#ed1524", "#f70110", "#ff0000"];
+
+export const MAPBOX_TOKEN = "pk.eyJ1IjoidGltaG4iLCJhIjoiY2tnbW1pZ2czMDVwYTJ1cXBkZzJjcXMxaCJ9.UNBlavlP3hhSmT5f7DRdBA";
 

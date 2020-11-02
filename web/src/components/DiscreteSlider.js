@@ -4,7 +4,7 @@ import Typography from '@material-ui/core/Typography';
 import Slider from '@material-ui/core/Slider';
 
 
-const WIDTH = 800
+const WIDTH = 600
 const useStyles = makeStyles({
   root: {
     width: WIDTH,
@@ -51,6 +51,7 @@ export default function DiscreteSlider({label, handleChange, name, marks}) {
           if (handleChange) handleChange(event);
           }}
         marks={marks}
+        color="secondary"
       />
     </div>
   );
