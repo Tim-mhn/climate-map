@@ -11,12 +11,11 @@ import DiscreteSlider from './DiscreteSlider';
 import { useFetchAll } from '../hooks/fetch';
 import { DATA_LAYER_STOPS, DATA_LAYER_COLOURS, BASIC_REQ_TIME_PERIODS, MONTHS } from '../utils/constants';
 
-
 export const RMapGL = () => {
 
     const iniViewport = {
-        width: 1600,
-        height: 800,
+        // width: 100,
+        // height: 800,
         latitude: 37.7577,
         longitude: -122.4376,
         zoom: 1
@@ -134,86 +133,102 @@ export const RMapGL = () => {
         var TOKEN = "pk.eyJ1IjoidGltaG4iLCJhIjoiY2tnbW1pZ2czMDVwYTJ1cXBkZzJjcXMxaCJ9.UNBlavlP3hhSmT5f7DRdBA"
 
         return (
-            <div style={{ height: '100%', position: 'relative' }}>
-                { tData && prData ?
-                    <ReactMapGL
-                        {...viewport}
-                        onViewportChange={(vp) => setViewport(vp)}
-                        mapboxApiAccessToken={TOKEN}>
+            <Grid container>
+                <Grid container item direction='row' xs={12} spacing={2}>
 
-                        <Source type="geojson" data={featuresCollection}>
-                            <Layer {...dataLayer}></Layer>
-                        </Source>
-                    </ReactMapGL>
-                    : <Grid
-                        container
-                        direction="row"
-                        justify="center"
-                        alignItems="center"
-                        style={{ height: iniViewport.height, width: iniViewport.width }}
-                    >
-                        <CircularProgress
-                            size={100}
-                        />
+                    <Grid container item direction='column' xs={8} spacing={2}>
+                        {/* Map */}
+
+                        <Grid item xs={8}>
+                            {tData && prData ?
+                                <ReactMapGL
+                                    width='99vw'
+                                    height='94vh'
+                                    {...viewport}
+                                    onViewportChange={(vp) => setViewport(vp)}
+                                    mapboxApiAccessToken={TOKEN}>
+
+                                    <Source type="geojson" data={featuresCollection}>
+                                        <Layer {...dataLayer}></Layer>
+                                    </Source>
+                                </ReactMapGL>
+                                : 
+                                        <CircularProgress
+                                        size={100}
+                                    />
+                            }
+                        </Grid>
                     </Grid>
-                }
 
 
-                <Select
-                    name="scenario"
-                    placeholder="Select scenario"
-                    defaultValue="a2"
-                    onChange={setInput}
-                >
-                    <option value="a2">a2</option>
-                    <option value="b1">b1</option>
-                </Select>
+                    <Grid container item direction='column' xs={4} spacing={1} justify='flex-start'>
+                        {/* Inputs */}
 
-                <Select
-                    name="variable"
-                    placeholder="Select variable"
-                    defaultValue="temperature"
-                    onChange={setInput}
-                >
-                    <option value="precipitation">Precipitation</option>
-                    <option value="temperature">Temperature</option>
-                </Select>
-                    <Select
-                        name="granulation"
-                        placeholder="Select granulation"
-                        defaultValue="year"
-                        onChange={setInput}
-                    >
-                        <option value="year">Year</option>
-                        <option value="month">Month</option>
-                    </Select>
+                        <Grid item >
+                            <Select
+                                name="variable"
+                                placeholder="Select variable"
+                                defaultValue="temperature"
+                                onChange={setInput}
+                            >
+                                <option value="precipitation">Precipitation</option>
+                                <option value="temperature">Temperature</option>
+                            </Select>
+                        </Grid>
 
-                    
-                
+                        <Grid item>
+                            <Select
+                                name="scenario"
+                                placeholder="Select scenario"
+                                defaultValue="a2"
+                                onChange={setInput}
+                            >
+                                <option value="a2">a2</option>
+                                <option value="b1">b1</option>
+                            </Select>
+                        </Grid>
 
 
-                <DiscreteSlider
-                    label="Period"
-                    name="fromYear"
-                    handleChange={setInput}
-                    marks={periodMarks}
-                />
-                {
-                    input.granulation == "month" ?
+                        <Grid item >
+                            <Select
+                                name="granulation"
+                                placeholder="Select granulation"
+                                defaultValue="year"
+                                onChange={setInput}
+                            >
+                                <option value="year">Year</option>
+                                <option value="month">Month</option>
+                            </Select>
+                        </Grid>
+                        <Grid item >
+                            <DiscreteSlider
+                                    label="Period"
+                                    name="fromYear"
+                                    handleChange={setInput}
+                                    marks={periodMarks}
+                                />
+                        </Grid>
+                        <Grid item >
+                            {
+                                input.granulation == "month" ?
 
-                    <DiscreteSlider
-                        label="Month"
-                        name="month"
-                        handleChange={setInput}
-                        marks={monthMarks}
-                    />
+                                    <DiscreteSlider
+                                        label="Month"
+                                        name="month"
+                                        handleChange={setInput}
+                                        marks={monthMarks}
+                                    />
 
-                    :
+                                    :
 
-                    <span></span>
-                }
+                                    <span></span>
+                            }
+                        </Grid>
+                        </Grid>
 
-            </div>
+                    </Grid>
+
+            </Grid>
 
         );
     }

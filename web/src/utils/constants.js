@@ -7,8 +7,8 @@ export const BASIC_REQ_TIME_PERIODS = {
 };
 
 export const MONTHS = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "Jan", "Feb", "Mar", "Ap", "May", "Jun",
+    "Jul", "Au", "Sep", "Oc", "Nov", "Dec"
 ];
 
 // Time periods allowed for start, end dates in climate API ensembled derived statistics requests
