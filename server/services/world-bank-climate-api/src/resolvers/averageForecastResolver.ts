@@ -2,6 +2,9 @@ import { Resolver, Query, Arg} from "type-graphql";
 import { CountryBaseForecast } from "../entities/CountryForecast";
 import { getIsoCodes } from '../utils/isoCodes';
 import { BASIC_REQ_TIME_PERIODS } from '../utils/constants';
+import { MonthlyForecast } from "../models/interfaces";
+import { addAnnualVals } from '../utils/forecast';
+
 
 const nodeFetch = require("node-fetch")
 
@@ -42,7 +45,6 @@ export class AverageForecastResolver {
                 finalVals = finalVals.map((countryFcs: any, idx: number) => {
                     const success = typeof(countryFcs) != typeof("string");
                     const errorMsg = success ? null : countryFcs;
-                    countryFcs = success ? editKeyName(countryFcs) : null;
 
 
                     return {
@@ -63,7 +65,7 @@ export class AverageForecastResolver {
     async alltime_forecasts(
         @Arg("iso3", () => [String], { defaultValue: null, nullable: true}) iso3: string[],
         @Arg("variable", () => String) variable: 'tas' | 'pr',
-        @Arg("type", () => String, { defaultValue: 'annualavg'}) type: 'annualavg' | 'annualanom' ,
+        @Arg("type", () => String, { defaultValue: 'mavg'}) type: 'annualavg' | 'annualanom' ,
         @Arg("percentile", { defaultValue: '50'}) percentile: '10' | '50' |'90' = '50',
         @Arg("test", { defaultValue: false}) test: boolean
     ) {
@@ -84,7 +86,6 @@ export class AverageForecastResolver {
                 finalVals = finalVals.map((countryFcs: any, idx: number) => {
                     const success = typeof(countryFcs) != typeof("string");
                     const errorMsg = success ? null : countryFcs;
-                    countryFcs = success ? editKeyName(countryFcs) : null;
                     return {"country": countryCodes[idx],  "data": countryFcs, "type": type, "variable": variable, "error": errorMsg}
                 });
 
@@ -97,28 +98,6 @@ export class AverageForecastResolver {
 
 }
 
-function editKeyName(countryFcs: any[] | string) {
-    /**
-     * Move 'monthVals' or 'annualVal' data into a 'value' key
-     */
-    if (countryFcs instanceof Array) {
-        // Change key name for each forecast per scenario
-        countryFcs.forEach((fc: any) => {
-            const targetKey = Object.keys(fc).includes("monthVals") ? "monthVals" : "annualVal";
-            fc["value"] = fc[targetKey];
-            delete fc[targetKey];
-        });
-
-        return countryFcs
-    }
-    // For wrong ISO codes, countryFcs is { "error" : "an error message"} and .forEach will raise an error. Do nothing and return v
-    else { 
-        console.error(`error edit key name with ${countryFcs} `);
-        const errorMessage: string = <string> <unknown>countryFcs;
-        return null;
-     }
-
-}
 
 function createCountryPromise(url: string, code: string) {
     /**
@@ -127,13 +106,9 @@ function createCountryPromise(url: string, code: string) {
      */
     return nodeFetch(`${url}${code}`)
         .then((res: any) => res.json())
-        // .then(data => {
-        //     // console.log(code);
-        //     // if (code.toLowerCase() == "can") console.log(data);
-        //     return data;
-        // })
+        .then((res: MonthlyForecast[])  => addAnnualVals(res))
         .catch((err: Error) => {
-            const errorMsg = `Error when fetching from ${url}${code}`;
+            const errorMsg = `Error when fetching from ${url}${code}. Details: ${err.message}`;
             console.error(errorMsg);
             return errorMsg ;
         })

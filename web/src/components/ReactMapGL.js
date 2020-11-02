@@ -9,7 +9,7 @@ import { useForm } from '../hooks/form';
 import { updateFeaturesCollection } from '../utils/featuresCollection';
 import DiscreteSlider from './DiscreteSlider';
 import { useFetchAll } from '../hooks/fetch';
-import { DATA_LAYER_STOPS, DATA_LAYER_COLOURS } from '../utils/constants';
+import { DATA_LAYER_STOPS, DATA_LAYER_COLOURS, BASIC_REQ_TIME_PERIODS, MONTHS } from '../utils/constants';
 
 
 export const RMapGL = () => {
@@ -26,7 +26,7 @@ export const RMapGL = () => {
     const [featuresCollection, setFeaturesCollection] = useState(null);
     const [iniColourRender, setIniColourRender] = useState(0);
     const [viewport, setViewport] = useState(iniViewport);
-    const [input, setInput] = useForm({ fromYear: "2020", scenario: "a2", variable: "temperature" });
+    const [input, setInput] = useForm({ fromYear: "2020", scenario: "a2", variable: "temperature", granulation: "year", "month": 0 });
 
     // Fetch Temperature + Precipitation data
     const { temperature, precipitation } = useFetchAll();
@@ -92,11 +92,22 @@ export const RMapGL = () => {
         console.log("updating colour ref value")
         const featuresWithRefVal = featuresColl.features.map(feature => {
             let prop = feature.properties[input.variable];
-            
-            const filter = (({ variable, ...o }) => o)(input) // Copy all key, values into filter except for "variable"
+            const refKey = input.granulation == "year" ? "annualVal" : "monthVals"
 
+            const filter = (({ variable, granulation, month, ...o }) => o)(input) // Copy all key, values into filter except for "variable"
+
+            const idx = input.granulation == "year" ? 0 : input.month
             // Find first element that matches all values in input (scenario, fromYear, ...)
-            let refValue = prop ? prop.find(el => Object.keys(filter).every(key => el[key] == filter[key])).value[0] : null;
+            let refValue;
+            try {
+                refValue = prop ? prop.find(el => Object.keys(filter).every(key => el[key] == filter[key]))[refKey][idx] : null;
+            } catch (e) {
+                console.error(e);
+                console.log(prop);
+                console.log(filter);
+                console.log(refKey);
+                refValue = null;
+            }
 
             // refValue += Math.random() * 10;
             const updatedProperties = { ...feature.properties, "value": refValue };
@@ -110,21 +121,17 @@ export const RMapGL = () => {
     }
 
 
+    const periodMarks = Object.entries(BASIC_REQ_TIME_PERIODS).map(([start, end]) => {
+        return { label: `${start}-${end}`, value: Number.parseInt(start)}
+       });
+
+    const monthMarks = MONTHS.map((month, idx) => { return { "value": idx, "label": month}});
     
     const Map = () => {
 
 
 
         var TOKEN = "pk.eyJ1IjoidGltaG4iLCJhIjoiY2tnbW1pZ2czMDVwYTJ1cXBkZzJjcXMxaCJ9.UNBlavlP3hhSmT5f7DRdBA"
-        // const useStyles = makeStyles((theme) => ({
-        //     root: {
-        //       display: 'flex',
-        //       '& > * + *': {
-        //         marginLeft: theme.spacing(5),
-        //       },
-        //     },
-        //   }));
-        // const loaderStyles = useStyles();
 
         return (
             <div style={{ height: '100%', position: 'relative' }}>
@@ -132,7 +139,6 @@ export const RMapGL = () => {
                     <ReactMapGL
                         {...viewport}
                         onViewportChange={(vp) => setViewport(vp)}
-                        // onClick={() => _loadTemperatureData()}
                         mapboxApiAccessToken={TOKEN}>
 
                         <Source type="geojson" data={featuresCollection}>
@@ -173,9 +179,26 @@ export const RMapGL = () => {
                     <option value="temperature">Temperature</option>
                 </Select>
 
+                <Select
+                    name="granulation"
+                    placeholder="Select granulation"
+                    defaultValue="year"
+                    onChange={setInput}
+                >
+                    <option value="year">Year</option>
+                    <option value="month">Month</option>
+                </Select>
+
                 <DiscreteSlider 
                     name="fromYear"
-                    handleChange={setInput} 
+                    handleChange={setInput}
+                    marks={periodMarks}
+                    />
+
+                <DiscreteSlider 
+                    name="month"
+                    handleChange={setInput}
+                    marks={monthMarks}
                     />
 
             </div>

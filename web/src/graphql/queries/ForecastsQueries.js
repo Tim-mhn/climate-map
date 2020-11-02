@@ -30,12 +30,13 @@ query Precipitations($start: String!, $end: String!) {
 }`
 
 export const AlltimeTemperatureQuery = gql`
-query AlltimeTemperatures {
-    alltime_forecasts(test: false, percentile: "50", type: "annualavg", variable: "tas") { 
+query AlltimeTemperatures($type: String) {
+    alltime_forecasts(test: false, percentile: "50", type: $type, variable: "tas") { 
   		country, 
     	data {
             scenario
-            value
+            annualVal
+            monthVals
             fromYear
             toYear
             percentile
@@ -45,12 +46,13 @@ query AlltimeTemperatures {
 }`
 
 export const AlltimePrecipitationQuery = gql`
-query AlltimePrecipitations {
-    alltime_forecasts(test: false, percentile: "50", type: "annualavg", variable: "pr") { 
+query AlltimePrecipitations($type: String) {
+    alltime_forecasts(test: false, percentile: "50", type: $type, variable: "pr") { 
   		country, 
     	data {
             scenario
-            value
+            annualVal
+            monthVals
             fromYear
             toYear
             percentile

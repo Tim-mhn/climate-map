@@ -12,7 +12,10 @@ export default class AverageForecast {
   toYear: string;
 
   @Field(() => [Float], { nullable: true})
-  value: number[];
+  monthVals: number[];
+
+  @Field(() => [Float], { nullable: true})
+  annualVal: number[];
 
   @Field()
   percentile: number
