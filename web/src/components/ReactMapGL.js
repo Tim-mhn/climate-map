@@ -9,7 +9,7 @@ import { useForm } from '../hooks/form';
 import { updateFeaturesCollection } from '../utils/featuresCollection';
 import DiscreteSlider from './DiscreteSlider';
 import { useFetchAll } from '../hooks/fetch';
-import { DATA_LAYER_STOPS, DATA_LAYER_COLOURS, BASIC_REQ_TIME_PERIODS, MONTHS } from '../utils/constants';
+import { DATA_LAYER_STOPS, DATA_LAYER_COLOURS, BASIC_REQ_TIME_PERIODS, MONTHS, MAPBOX_TOKEN } from '../utils/constants';
 
 export const RMapGL = () => {
 
@@ -67,13 +67,9 @@ export const RMapGL = () => {
 
         if (featuresCollection) {
 
-
-
             let stops = DATA_LAYER_STOPS[input.variable];
             // Assert that stops and colours have same number of elements !
             if (stops.length != DATA_LAYER_COLOURS.length) {
-                console.error(stops);
-                console.error(stops.length)
                 throw Error(`Error in updating data layer paint. Stops and colours don't have same length ${DATA_LAYER_STOPS} --- ${DATA_LAYER_COLOURS}`);
             }
             stops = stops.map((st, idx) => [st, DATA_LAYER_COLOURS[idx]]);
@@ -88,7 +84,6 @@ export const RMapGL = () => {
     // Set the value used for country colour by looking into property 
     // and finding the element that has field attribute = filterVal
     const _updateColourRefValue = (featuresColl, input) => {
-        console.log("updating colour ref value")
         const featuresWithRefVal = featuresColl.features.map(feature => {
             let prop = feature.properties[input.variable];
             const refKey = input.granulation == "year" ? "annualVal" : "monthVals"
@@ -102,13 +97,9 @@ export const RMapGL = () => {
                 refValue = prop ? prop.find(el => Object.keys(filter).every(key => el[key] == filter[key]))[refKey][idx] : null;
             } catch (e) {
                 console.error(e);
-                console.log(prop);
-                console.log(filter);
-                console.log(refKey);
                 refValue = null;
             }
 
-            // refValue += Math.random() * 10;
             const updatedProperties = { ...feature.properties, "value": refValue };
 
 
@@ -129,9 +120,6 @@ export const RMapGL = () => {
     const Map = () => {
 
 
-
-        var TOKEN = "pk.eyJ1IjoidGltaG4iLCJhIjoiY2tnbW1pZ2czMDVwYTJ1cXBkZzJjcXMxaCJ9.UNBlavlP3hhSmT5f7DRdBA"
-
         return (
             <Grid container>
                 <Grid container item direction='row' xs={12} spacing={2}>
@@ -146,7 +134,7 @@ export const RMapGL = () => {
                                     height='94vh'
                                     {...viewport}
                                     onViewportChange={(vp) => setViewport(vp)}
-                                    mapboxApiAccessToken={TOKEN}>
+                                    mapboxApiAccessToken={MAPBOX_TOKEN}>
 
                                     <Source type="geojson" data={featuresCollection}>
                                         <Layer {...dataLayer}></Layer>

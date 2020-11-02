@@ -23,3 +23,5 @@ export const DATA_LAYER_STOPS = {
 };
 export const DATA_LAYER_COLOURS = ["#00FF7F", "#27dc54", "#3BCA6D", "#77945C", "#818a77", "#B25F4A", "#ED2938", "#ed1524", "#f70110", "#ff0000"];
 
+export const MAPBOX_TOKEN = "pk.eyJ1IjoidGltaG4iLCJhIjoiY2tnbW1pZ2czMDVwYTJ1cXBkZzJjcXMxaCJ9.UNBlavlP3hhSmT5f7DRdBA";
+

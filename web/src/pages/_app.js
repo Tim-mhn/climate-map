@@ -1,7 +1,6 @@
 import { ThemeProvider, CSSReset, ColorModeProvider } from '@chakra-ui/core'
 import { ApolloClient, InMemoryCache, ApolloProvider  } from '@apollo/client';
 import theme from '../theme'
-import "../App.css"
 
 
 const client = new ApolloClient({

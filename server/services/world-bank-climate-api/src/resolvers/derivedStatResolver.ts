@@ -51,7 +51,6 @@ export class DerivedStatResolver {
         let forecasts: any[] = [];
         for (let yearPair of timePeriods) {
             try {
-                // const t = AnnualForecast
                 let averageFcs: [AnnualForecast | MonthlyForecast] = await loadJson(pptPredUrl(avg, yearPair.start, yearPair.end));
                 let annomalyFcs: [AnnualForecast | MonthlyForecast] = await loadJson(pptPredUrl(anom, yearPair.start, yearPair.end));
 
