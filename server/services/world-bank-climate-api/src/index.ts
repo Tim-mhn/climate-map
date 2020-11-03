@@ -1,6 +1,7 @@
 import { ApolloServer } from 'apollo-server-express';
 const express = require('express')
 import 'reflect-metadata';
+import "dotenv-safe/config"
 import { buildSchema } from 'type-graphql';
 import { AverageForecastResolver } from './resolvers/averageForecastResolver';
 import { DerivedStatResolver } from './resolvers/derivedStatResolver';
@@ -19,8 +20,8 @@ async function startServer() {
   });
 
   server.applyMiddleware({ app });
-  const PORT = 4000;
-  app.listen(PORT, () =>
+  const PORT = process.env.PORT;
+  app.listen(parseInt(process.env.PORT), () =>
     console.log(`Server is running on http://localhost:${PORT}/graphql`)
   );
 }

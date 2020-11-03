@@ -4,13 +4,13 @@
 # -----------------------------------------------
 
 type AverageForecast {
-  scenario: String!
-  fromYear: String!
-  toYear: String!
-  monthVals: [Float!]
   annualVal: [Float!]
-  percentile: Float!
   error: String
+  fromYear: String!
+  monthVals: [Float!]
+  percentile: Float!
+  scenario: String!
+  toYear: String!
 }
 
 type CountryBaseForecast {
@@ -26,19 +26,19 @@ type CountryPrecipitationForecast {
 }
 
 type PrecipitationForecast {
-  scenario: String
-  fromYear: String!
-  toYear: String!
-  avg: [Float!]
   anom: [Float!]
-  percentile: Float
+  avg: [Float!]
   error: String
+  fromYear: String!
+  percentile: Float
+  scenario: String
+  toYear: String!
 }
 
 type Query {
-  hello: String!
-  forecasts(test: Boolean = false, percentile: String = "50", end: String!, start: String!, type: String = "annualavg", variable: String!, iso3: [String!] = null): [CountryBaseForecast!]!
-  alltime_forecasts(test: Boolean = false, percentile: String = "50", type: String = "mavg", variable: String!, iso3: [String!] = null): [CountryBaseForecast!]!
-  hot_days(test: Boolean = false, percentile: String = "50", end: String!, start: String!, type: String = "annualavg", iso3: String = null): CountryBaseForecast!
+  alltime_forecasts(iso3: [String!] = null, percentile: String = "50", test: Boolean = false, type: String = "mavg", variable: String!): [CountryBaseForecast!]!
   daily_ppt_forecasts(granulation: String = "year", iso3: String = null): CountryPrecipitationForecast!
+  forecasts(end: String!, iso3: [String!] = null, percentile: String = "50", start: String!, test: Boolean = false, type: String = "annualavg", variable: String!): [CountryBaseForecast!]!
+  hello: String!
+  hot_days(end: String!, iso3: String = null, percentile: String = "50", start: String!, test: Boolean = false, type: String = "annualavg"): CountryBaseForecast!
 }
