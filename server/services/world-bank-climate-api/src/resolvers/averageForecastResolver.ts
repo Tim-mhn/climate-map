@@ -2,8 +2,9 @@ import { Resolver, Query, Arg} from "type-graphql";
 import { CountryBaseForecast } from "../entities/CountryForecast";
 import { getIsoCodes } from '../utils/isoCodes';
 import { BASIC_REQ_TIME_PERIODS } from '../utils/constants';
-import { MonthlyForecast } from "../models/interfaces";
+import { BasicCountryRequestResponse, ExtendedForecast, MonthlyForecast } from "../models/interfaces";
 import { addAnnualVals } from '../utils/forecast';
+import { arrayFlatten } from "../utils/array";
 
 
 const nodeFetch = require("node-fetch")
@@ -69,9 +70,9 @@ export class AverageForecastResolver {
         @Arg("percentile", { defaultValue: '50'}) percentile: '10' | '50' |'90' = '50',
         @Arg("test", { defaultValue: false}) test: boolean
     ) {
+        console.debug(`Calling alltime_forecasts with args: ${iso3} ${variable} ${percentile} ${type}`)
         let baseUrl = "http://climatedataapi.worldbank.org/climateweb/rest/v1/country/"
         let url = `${baseUrl}${type}/ensemble/${percentile}/${variable}/`;
-        console.count(`All time forecasts called ! with args: ${iso3} ${variable} ${percentile} ${type}`)
 
         // Get all codes if iso3 is null
         let countryCodes: string[] = iso3 ? (toArray(iso3)) : await getIsoCodes();
@@ -79,14 +80,19 @@ export class AverageForecastResolver {
         // Reduce query time when developing
         if (test) countryCodes = countryCodes.slice(1, 10);
 
-        let countryPromises: Promise<any[]>[] = countryCodes.map((code: string) => createAlltimeCountryPromise(url, code));
+        let countryPromises = countryCodes.map((code: string) => createAlltimeCountryPromise(url, code));
 
         return Promise.all(countryPromises)
             .then((finalVals: any) => {
                 finalVals = finalVals.map((countryFcs: any, idx: number) => {
                     const success = typeof(countryFcs) != typeof("string");
-                    const errorMsg = success ? null : countryFcs;
-                    return {"country": countryCodes[idx],  "data": countryFcs, "type": type, "variable": variable, "error": errorMsg}
+                    return {
+                        "country": countryCodes[idx],  
+                        "data": success ? countryFcs : null, 
+                        "type": type, 
+                        "variable": variable, 
+                        "error": success ? null : countryFcs
+                    }
                 });
 
                 return finalVals;
@@ -99,52 +105,56 @@ export class AverageForecastResolver {
 }
 
 
-function createCountryPromise(url: string, code: string) {
+function createCountryPromise(url: string, code: string): Promise<BasicCountryRequestResponse> {
     /**
      *  Create a promise for each country to handle bad requests (like for Antarticta) and return null in that case
      *  Inputs: base url and iso3 country code
      */
     return nodeFetch(`${url}${code}`)
         .then((res: any) => res.json())
-        .then((res: MonthlyForecast[])  => addAnnualVals(res))
+        .catch(err => console.error(err))
+        .then((res: ExtendedForecast[])  => {
+            return { data: addAnnualVals(res), error: null }
+        })
         .catch((err: Error) => {
             const errorMsg = `Error when fetching from ${url}${code}. Details: ${err.message}`;
             console.error(errorMsg);
-            return errorMsg ;
+            return { data: null, error: errorMsg }
         })
 }
 
-function createAlltimeCountryPromise(url: string, code: string): Promise<any[]  > {
+
+
+function createAlltimeCountryPromise(url: string, code: string): Promise<string | ExtendedForecast[] > {
     /**
      *  Create a promise for each country to handle bad requests (like for Antarticta) and return null in that case
      *  Inputs: base url and iso3 country code
      */
 
-    const countryAlltimePromises: Promise<any>[] = BASIC_REQ_TIME_PERIODS.map(([start, end]: string[]) => {
+    const countryAlltimePromises = BASIC_REQ_TIME_PERIODS.map(([start, end]: string[]) => {
         let startEndUrl = `${url}${start}/${end}/`;
         return createCountryPromise(startEndUrl, code)
     })
 
     return Promise.all(countryAlltimePromises)
-        .then((countryAlltimeRes: any[][]) => {
-            // if (countryAlltimeRes.every(res => res instanceof String)) return null
-            const successfulRes = countryAlltimeRes.filter(res => typeof(res) != "string");
-            if (successfulRes.length > 0) return _flatten(successfulRes);
-            const firstErrorMsg = countryAlltimeRes[0];
+        .then((countryAlltimeRes: BasicCountryRequestResponse[]) => {
+            // Keep only succesful queries responses
+            const successfulRes = countryAlltimeRes.filter(res => res.data);
+            // If some queries have worked, return the flattened array of forecasts (res.data)
+            if (successfulRes.length > 0) return arrayFlatten(successfulRes.map(res => res.data));
+            // If all queries have failed, return first error message
+            return countryAlltimeRes[0].error;
 
-            return firstErrorMsg;
         })
-        .catch((error) => {
-            console.error(`Erorr on create all time country promises ${error}`);
-            return [];
+        .catch((error: Error) => {
+            console.error(`Error on create all time country promises for ${code}: ${error.message}`);
+            return error.message;
         })
 
     
 }
 
-function _flatten(nestedArr: any[][]) {
-    return nestedArr.reduce((prev, curr) => prev.concat(curr), []);
-}
+
 
 
 function toArray(obj: any) {

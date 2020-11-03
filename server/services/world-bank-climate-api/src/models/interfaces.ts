@@ -14,3 +14,17 @@ export interface MonthlyForecast {
     "percentile": number
 }
 
+export interface ExtendedForecast {
+    "scenario": string;
+    "fromYear": number;
+    "toYear": number;
+    "monthVals": number[];
+    "annualVal": number[]
+    "percentile": number
+}
+
+export interface BasicCountryRequestResponse {
+    error: string;
+    data: ExtendedForecast[];
+}
+
