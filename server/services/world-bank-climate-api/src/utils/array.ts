@@ -14,3 +14,7 @@ export function arraySum(arr: number[]) {
         return 0;
     }
 }
+
+export function arrayFlatten(nestedArr: any[][]) {
+    return nestedArr.reduce((prev, curr) => prev.concat(curr), []);
+}
