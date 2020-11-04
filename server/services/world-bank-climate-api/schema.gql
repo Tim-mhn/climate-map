@@ -40,5 +40,5 @@ type Query {
   daily_ppt_forecasts(granulation: String = "year", iso3: String = null): CountryPrecipitationForecast!
   forecasts(end: String!, iso3: [String!] = null, percentile: String = "50", start: String!, test: Boolean = false, type: String = "annualavg", variable: String!): [CountryBaseForecast!]!
   hello: String!
-  hot_days(end: String!, iso3: String = null, percentile: String = "50", start: String!, test: Boolean = false, type: String = "annualavg"): CountryBaseForecast!
+  hot_days(end: String!, iso3: String = null, percentile: String = "50", start: String!, test: Boolean = false, type: String = "mavg"): CountryBaseForecast!
 }

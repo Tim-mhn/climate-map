@@ -5,6 +5,7 @@ import { BASIC_REQ_TIME_PERIODS } from '../utils/constants';
 import { BasicCountryRequestResponse, ExtendedForecast, MonthlyForecast } from "../models/interfaces";
 import { addAnnualVals } from '../utils/forecast';
 import { arrayFlatten } from "../utils/array";
+import { createCountryPromise } from "../utils/promises";
 
 
 const nodeFetch = require("node-fetch")
@@ -105,23 +106,7 @@ export class AverageForecastResolver {
 }
 
 
-function createCountryPromise(url: string, code: string): Promise<BasicCountryRequestResponse> {
-    /**
-     *  Create a promise for each country to handle bad requests (like for Antarticta) and return null in that case
-     *  Inputs: base url and iso3 country code
-     */
-    return nodeFetch(`${url}${code}`)
-        .then((res: any) => res.json())
-        .catch(err => console.error(err))
-        .then((res: ExtendedForecast[])  => {
-            return { data: addAnnualVals(res), error: null }
-        })
-        .catch((err: Error) => {
-            const errorMsg = `Error when fetching from ${url}${code}. Details: ${err.message}`;
-            console.error(errorMsg);
-            return { data: null, error: errorMsg }
-        })
-}
+
 
 
 

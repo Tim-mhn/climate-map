@@ -1,4 +1,4 @@
-import { loadJson } from "./loadJson";
+import { loadJson } from "./promises";
 
 
 const ISO3_ENDPOINTS = "http://countries.petethompson.net/data/countries.json"
