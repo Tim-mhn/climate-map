@@ -14,5 +14,6 @@ export function addAnnualVals(forecasts: MonthlyForecast[]) {
     return forecasts.map((el: any) => {
         el = {...el, annualVal: [arraySum(el.monthVals)]}
         return el
-      })
+    })
+
 }

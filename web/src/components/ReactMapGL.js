@@ -10,6 +10,8 @@ import { updateFeaturesCollection } from '../utils/featuresCollection';
 import DiscreteSlider from './DiscreteSlider';
 import { useFetchAll } from '../hooks/fetch';
 import { DATA_LAYER_STOPS, DATA_LAYER_COLOURS, BASIC_REQ_TIME_PERIODS, MONTHS, MAPBOX_TOKEN } from '../utils/constants';
+import { useGraphQL } from '../hooks/graphql';
+import { AlltimeTemperatureQuery } from '../graphql/queries/ForecastsQueries';
 
 export const RMapGL = () => {
 
@@ -29,6 +31,8 @@ export const RMapGL = () => {
 
     // Fetch Temperature + Precipitation data
     const { temperature, precipitation } = useFetchAll();
+    const [anomTLoading, anomTError, anomTData] = useGraphQL(AlltimeTemperatureQuery, { type: "anom" });
+
     const [tLoading, tError, tData] = temperature;
     const [prLoading, prError, prData] = precipitation;
 
@@ -45,11 +49,19 @@ export const RMapGL = () => {
         }
     }, [tData, prData]);
 
+    useEffect(() => {
+        if (anomTData) {
+            addAnom(featuresCollection, "temperature", anomTData);
+        }
 
+    }, [anomTData, featuresCollection]);
     // Update "reference" value for country colouring on scenario update in featuresCollection
     useEffect(() => {
         if (featuresCollection) _updateColourRefValue(featuresCollection, input)
     }, [iniColourRender, input]);
+
+
+
 
     // Update styles data layer on features collection update
     const dataLayer = useMemo(() => {
@@ -75,6 +87,7 @@ export const RMapGL = () => {
             stops = stops.map((st, idx) => [st, DATA_LAYER_COLOURS[idx]]);
 
             dataLayer.paint['fill-color'].stops = stops;
+            console.log(featuresCollection)
         }
 
         return dataLayer
@@ -107,7 +120,22 @@ export const RMapGL = () => {
         });
 
         const updatedFeaturesColl = { ...featuresColl, "features": featuresWithRefVal };
+        console.log(featuresWithRefVal)
         setFeaturesCollection(updatedFeaturesColl);
+    }
+
+    const addAnom = (featuresColl, variable, anomData) =>  {
+        console.log(featuresColl);
+        console.log(anomData);
+        console.log(anomData.alltime_forecasts)
+        if (!anomData || !featuresColl) return;
+        for (const countryAnomData of anomData.alltime_forecasts) {
+            let countryFeature = featuresColl.features.find(feat => feat.properties.ISO_A3 == countryAnomData.country);
+            console.log(countryAnomData);
+            console.log(countryFeature)
+            countryFeature.variable = { ...countryFeature.variable, }
+        }
+        return 1;
     }
 
 
