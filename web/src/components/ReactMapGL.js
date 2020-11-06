@@ -95,11 +95,10 @@ export const RMapGL = () => {
 
 
     const _getRelativeAnom = (featureProperties, input) => {
-        const anomProp = featureProperties[input.variable];
-        const grossPropName = anomToGross(input.variable);
-        const grossProp = featureProperties[grossPropName];
-        const grossValue = getForecastValueFromProp(grossProp, input)
-        const anomValue = getForecastValueFromProp(anomProp, input)
+        const anomProp = featureProperties[input.variable]; // 'temperatureAnom' property ie
+        const grossProp = featureProperties[anomToGross(input.variable)]; // 'temperature' property ie
+        const grossValue = getForecastValueFromProp(grossProp, input);
+        const anomValue = getForecastValueFromProp(anomProp, input);
         return anomValue / grossValue;
 
 
@@ -142,7 +141,7 @@ export const RMapGL = () => {
             <Grid container>
                 <Grid container item direction='row' xs={12} spacing={2}>
 
-                    <Grid container item direction='column' xs={8} spacing={2}>
+                    <Grid container item direction='column' xs={10} spacing={2}>
                         {/* Map */}
 
                         <Grid item xs={8}>
@@ -151,8 +150,8 @@ export const RMapGL = () => {
                              */}
                             {fetchedAll ?
                                 <ReactMapGL
-                                    width='99vw'
-                                    height='94vh'
+                                    width='80vw'
+                                    height='80vh'
                                     {...viewport}
                                     onViewportChange={(vp) => setViewport(vp)}
                                     mapboxApiAccessToken={MAPBOX_TOKEN}>
@@ -170,7 +169,7 @@ export const RMapGL = () => {
                     </Grid>
 
 
-                    <Grid container item direction='column' xs={4} spacing={1} justify='flex-start'>
+                    <Grid container item direction='column' xs={2} spacing={1} justify='flex-start' style= { { 'background-color': 'rgba(110, 110, 100, 0.7)', 'zIndex': 999}}>
                         {/* Inputs */}
 
                         <Grid item >

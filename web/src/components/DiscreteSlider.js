@@ -4,7 +4,7 @@ import Typography from '@material-ui/core/Typography';
 import Slider from '@material-ui/core/Slider';
 
 
-const WIDTH = 600
+const WIDTH = 300
 const useStyles = makeStyles({
   root: {
     width: WIDTH,
