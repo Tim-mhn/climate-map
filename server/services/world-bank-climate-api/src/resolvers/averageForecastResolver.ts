@@ -67,19 +67,20 @@ export class AverageForecastResolver {
     async alltime_forecasts(
         @Arg("iso3", () => [String], { defaultValue: null, nullable: true}) iso3: string[],
         @Arg("variable", () => String) variable: 'tas' | 'pr',
-        @Arg("type", () => String, { defaultValue: 'mavg'}) type: 'annualavg' | 'annualanom' ,
+        @Arg("type", () => String, { defaultValue: 'avg'}) type: 'avg' | 'anom' ,
         @Arg("percentile", { defaultValue: '50'}) percentile: '10' | '50' |'90' = '50',
         @Arg("test", { defaultValue: false}) test: boolean
     ) {
         console.debug(`Calling alltime_forecasts with args: ${iso3} ${variable} ${percentile} ${type}`)
         let baseUrl = "http://climatedataapi.worldbank.org/climateweb/rest/v1/country/"
-        let url = `${baseUrl}${type}/ensemble/${percentile}/${variable}/`;
+        const apiType = "m"+type; // manom or mavg
+        let url = `${baseUrl}${apiType}/ensemble/${percentile}/${variable}/`;
 
         // Get all codes if iso3 is null
         let countryCodes: string[] = iso3 ? (toArray(iso3)) : await getIsoCodes();
 
         // Reduce query time when developing
-        if (test) countryCodes = countryCodes.slice(1, 10);
+        if (test) countryCodes = countryCodes.slice(1, 3);
 
         let countryPromises = countryCodes.map((code: string) => createAlltimeCountryPromise(url, code));
 

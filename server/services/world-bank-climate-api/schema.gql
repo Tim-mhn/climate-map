@@ -36,7 +36,7 @@ type PrecipitationForecast {
 }
 
 type Query {
-  alltime_forecasts(iso3: [String!] = null, percentile: String = "50", test: Boolean = false, type: String = "mavg", variable: String!): [CountryBaseForecast!]!
+  alltime_forecasts(iso3: [String!] = null, percentile: String = "50", test: Boolean = false, type: String = "avg", variable: String!): [CountryBaseForecast!]!
   daily_ppt_forecasts(granulation: String = "year", iso3: String = null): CountryPrecipitationForecast!
   forecasts(end: String!, iso3: [String!] = null, percentile: String = "50", start: String!, test: Boolean = false, type: String = "annualavg", variable: String!): [CountryBaseForecast!]!
   hello: String!

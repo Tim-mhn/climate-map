@@ -4,12 +4,15 @@ import { Select } from "@chakra-ui/core";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 import { getAllGeoJSONs } from '../utils/geojson'
 import { useForm } from '../hooks/form';
-import { updateFeaturesCollection } from '../utils/featuresCollection';
+import { anomToGross, getForecastValueFromProp, isInputVariableAnom, updateFeaturesCollection } from '../utils/featuresCollection';
 import DiscreteSlider from './DiscreteSlider';
 import { useFetchAll } from '../hooks/fetch';
 import { DATA_LAYER_STOPS, DATA_LAYER_COLOURS, BASIC_REQ_TIME_PERIODS, MONTHS, MAPBOX_TOKEN } from '../utils/constants';
+import { isInputType } from 'graphql';
 
 export const RMapGL = () => {
 
@@ -25,31 +28,41 @@ export const RMapGL = () => {
     const [featuresCollection, setFeaturesCollection] = useState(null);
     const [iniColourRender, setIniColourRender] = useState(0);
     const [viewport, setViewport] = useState(iniViewport);
-    const [input, setInput] = useForm({ fromYear: "2020", scenario: "a2", variable: "temperature", granulation: "year", "month": 0 });
+    const [input, setInput] = useForm({ fromYear: "2020", scenario: "a2", variable: "temperature", granulation: "year", "month": 0, "relative": false });
 
-    // Fetch Temperature + Precipitation data
-    const { temperature, precipitation } = useFetchAll();
-    const [tLoading, tError, tData] = temperature;
-    const [prLoading, prError, prData] = precipitation;
+    // Fetch all time Temperature + Precipitation average and anomaly  data
+    const [alltimeQueriesResp, fetchedAll] = useFetchAll();
+
+
 
 
     // Load GeoJSON data of all countries only on startup
     useEffect(() => {
-        if (tData && prData) {
+
+        if (fetchedAll) {
+            console.count("Use effect called")
+            console.info(alltimeQueriesResp)
             getAllGeoJSONs().then(geojsons => {
-                let updatedFeatures = updateFeaturesCollection(geojsons, tData, "temperature");
-                updatedFeatures = updateFeaturesCollection(updatedFeatures, prData, "precipitation");
+                let updatedFeatures = geojsons;
+
+                Object.entries(alltimeQueriesResp).forEach(([queryName, queryRes]) => {
+                    const [loading, error, data] = queryRes;
+                    if (data) updatedFeatures = updateFeaturesCollection(updatedFeatures, data, queryName);
+                });
+
                 setFeaturesCollection(updatedFeatures);
                 setIniColourRender(iniColourRender + 1);
             });
         }
-    }, [tData, prData]);
-
+    }, [fetchedAll]);
 
     // Update "reference" value for country colouring on scenario update in featuresCollection
     useEffect(() => {
         if (featuresCollection) _updateColourRefValue(featuresCollection, input)
     }, [iniColourRender, input]);
+
+
+
 
     // Update styles data layer on features collection update
     const dataLayer = useMemo(() => {
@@ -67,7 +80,7 @@ export const RMapGL = () => {
 
         if (featuresCollection) {
 
-            let stops = DATA_LAYER_STOPS[input.variable];
+            let stops = DATA_LAYER_STOPS[input.variable] ? DATA_LAYER_STOPS[input.variable] : DATA_LAYER_STOPS["default"];
             // Assert that stops and colours have same number of elements !
             if (stops.length != DATA_LAYER_COLOURS.length) {
                 throw Error(`Error in updating data layer paint. Stops and colours don't have same length ${DATA_LAYER_STOPS} --- ${DATA_LAYER_COLOURS}`);
@@ -81,31 +94,35 @@ export const RMapGL = () => {
     }, [featuresCollection]);
 
 
+    const _getRelativeAnom = (featureProperties, input) => {
+        const anomProp = featureProperties[input.variable]; // 'temperatureAnom' property ie
+        const grossProp = featureProperties[anomToGross(input.variable)]; // 'temperature' property ie
+        const grossValue = getForecastValueFromProp(grossProp, input);
+        const anomValue = getForecastValueFromProp(anomProp, input);
+        return anomValue / grossValue;
+
+
+    }
     // Set the value used for country colour by looking into property 
     // and finding the element that has field attribute = filterVal
     const _updateColourRefValue = (featuresColl, input) => {
+
         const featuresWithRefVal = featuresColl.features.map(feature => {
             let prop = feature.properties[input.variable];
-            const refKey = input.granulation == "year" ? "annualVal" : "monthVals"
 
-            const filter = (({ variable, granulation, month, ...o }) => o)(input) // Copy all key, values into filter except for "variable"
-
-            const idx = input.granulation == "year" ? 0 : input.month
-            // Find first element that matches all values in input (scenario, fromYear, ...)
             let refValue;
             try {
-                refValue = prop ? prop.find(el => Object.keys(filter).every(key => el[key] == filter[key]))[refKey][idx] : null;
+                refValue = (input.relative && isInputVariableAnom(input)) ? _getRelativeAnom(feature.properties, input) : getForecastValueFromProp(prop, input);
             } catch (e) {
-                console.error(e);
-                refValue = null;
-            }
+                console.error(e.message);
+                refValue = null
+            };
 
             const updatedProperties = { ...feature.properties, "value": refValue };
-
-
             return { ...feature, "properties": updatedProperties }
         });
 
+        console.info(featuresWithRefVal);
         const updatedFeaturesColl = { ...featuresColl, "features": featuresWithRefVal };
         setFeaturesCollection(updatedFeaturesColl);
     }
@@ -124,14 +141,17 @@ export const RMapGL = () => {
             <Grid container>
                 <Grid container item direction='row' xs={12} spacing={2}>
 
-                    <Grid container item direction='column' xs={8} spacing={2}>
+                    <Grid container item direction='column' xs={10} spacing={2}>
                         {/* Map */}
 
                         <Grid item xs={8}>
-                            {tData && prData ?
+                            {/**TODO:
+                             * load map as soon as data for selected input is ready (average temperature on load)
+                             */}
+                            {fetchedAll ?
                                 <ReactMapGL
-                                    width='99vw'
-                                    height='94vh'
+                                    width='80vw'
+                                    height='80vh'
                                     {...viewport}
                                     onViewportChange={(vp) => setViewport(vp)}
                                     mapboxApiAccessToken={MAPBOX_TOKEN}>
@@ -140,16 +160,16 @@ export const RMapGL = () => {
                                         <Layer {...dataLayer}></Layer>
                                     </Source>
                                 </ReactMapGL>
-                                : 
-                                        <CircularProgress
-                                        size={100}
-                                    />
+                                :
+                                <CircularProgress
+                                    size={100}
+                                />
                             }
                         </Grid>
                     </Grid>
 
 
-                    <Grid container item direction='column' xs={4} spacing={1} justify='flex-start'>
+                    <Grid container item direction='column' xs={2} spacing={1} justify='flex-start' style= { { 'background-color': 'rgba(110, 110, 100, 0.7)', 'zIndex': 999}}>
                         {/* Inputs */}
 
                         <Grid item >
@@ -159,8 +179,10 @@ export const RMapGL = () => {
                                 defaultValue="temperature"
                                 onChange={setInput}
                             >
-                                <option value="precipitation">Precipitation</option>
-                                <option value="temperature">Temperature</option>
+                                {Object.keys(alltimeQueriesResp).map(queryName => {
+                                    return <option value={queryName}>{queryName}</option>
+                                })}
+
                             </Select>
                         </Grid>
 
@@ -188,13 +210,29 @@ export const RMapGL = () => {
                                 <option value="month">Month</option>
                             </Select>
                         </Grid>
+
+                        <Grid item>
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        defaultChecked={false}
+                                        onChange={setInput}
+                                        name="relative"
+                                        color="primary"
+                                        disabled={!isInputVariableAnom(input)}
+                                    />
+                                }
+                                label="Relative anomaly"
+                            />
+                        </Grid>
+
                         <Grid item >
                             <DiscreteSlider
-                                    label="Period"
-                                    name="fromYear"
-                                    handleChange={setInput}
-                                    marks={periodMarks}
-                                />
+                                label="Period"
+                                name="fromYear"
+                                handleChange={setInput}
+                                marks={periodMarks}
+                            />
                         </Grid>
                         <Grid item >
                             {
@@ -212,9 +250,9 @@ export const RMapGL = () => {
                                     <span></span>
                             }
                         </Grid>
-                        </Grid>
-
                     </Grid>
+
+                </Grid>
 
             </Grid>
 
