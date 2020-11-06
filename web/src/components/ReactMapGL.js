@@ -287,4 +287,3 @@ export const RMapGL = () => {
     return Map();
 }
 
-// export const RMapGL = Map;
