@@ -284,6 +284,6 @@ export const RMapGL = () => {
         );
     }
 
-    return Map();
+    return Map(); 
 }
 
