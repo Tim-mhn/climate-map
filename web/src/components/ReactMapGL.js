@@ -1,10 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import ReactMapGL, { Source, Layer } from 'react-map-gl';
-import { Select } from "@chakra-ui/core";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
+import { makeStyles } from '@material-ui/core/styles';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
 import Switch from '@material-ui/core/Switch';
 import { getAllGeoJSONs } from '../utils/geojson'
 import { useForm } from '../hooks/form';
@@ -12,7 +17,7 @@ import { anomToGross, getForecastValueFromProp, isInputVariableAnom, updateFeatu
 import DiscreteSlider from './DiscreteSlider';
 import { useFetchAll } from '../hooks/fetch';
 import { DATA_LAYER_STOPS, DATA_LAYER_COLOURS, BASIC_REQ_TIME_PERIODS, MONTHS, MAPBOX_TOKEN } from '../utils/constants';
-import { isInputType } from 'graphql';
+
 
 export const RMapGL = () => {
 
@@ -25,6 +30,17 @@ export const RMapGL = () => {
         longitude: -100,
         zoom: 1
     }
+    const useStyles = makeStyles((theme) => ({
+        formControl: {
+            margin: theme.spacing(1),
+            minWidth: 120,
+        },
+        selectEmpty: {
+            marginTop: theme.spacing(2),
+        },
+    }));
+
+    const classes = useStyles();
 
 
     const [featuresCollection, setFeaturesCollection] = useState(null);
@@ -171,47 +187,54 @@ export const RMapGL = () => {
                     </Grid>
 
 
-                    <Grid container item direction='column' xs={2} spacing={1} justify='flex-start' style= { { 'background-color': 'rgba(110, 110, 100, 0.7)', 'zIndex': 999}}>
+                    <Grid container item direction='column' xs={2} spacing={1} justify='flex-start' style={{ 'zIndex': 999 }}>
                         {/* Inputs */}
 
-                        <Grid item >
+                        <FormControl variant="outlined" className={classes.formControl}>
+                            <InputLabel id="variable-select-label">Variable</InputLabel>
                             <Select
+                                labelId="variable-select-label"
                                 name="variable"
-                                placeholder="Select variable"
+                                label="variable"
+                                // placeholder="Select variable"
                                 defaultValue="temperature"
                                 onChange={setInput}
                             >
                                 {Object.keys(alltimeQueriesResp).map(queryName => {
-                                    return <option value={queryName}>{queryName}</option>
+                                    return <MenuItem value={queryName}>{queryName}</MenuItem>
                                 })}
 
                             </Select>
-                        </Grid>
+                        </FormControl>
 
-                        <Grid item>
+                        <FormControl variant="outlined" className={classes.formControl}>
+                            <InputLabel id="scenario-select-label">Variable</InputLabel>
                             <Select
                                 name="scenario"
+                                label="scenario"
+                                labelId="scenario-select-label"
                                 placeholder="Select scenario"
                                 defaultValue="a2"
                                 onChange={setInput}
                             >
-                                <option value="a2">a2</option>
-                                <option value="b1">b1</option>
+                                <MenuItem value="a2">a2</MenuItem>
+                                <MenuItem value="b1">b1</MenuItem>
                             </Select>
-                        </Grid>
+                        </FormControl>
 
 
-                        <Grid item >
+                        <FormControl variant="outlined" className={classes.formControl}>
+                            <InputLabel id="granulation-select-label">Variable</InputLabel>
                             <Select
                                 name="granulation"
-                                placeholder="Select granulation"
-                                defaultValue="year"
+                                label="granulation"
+                                labelId="granulation-select-label"                                defaultValue="year"
                                 onChange={setInput}
                             >
-                                <option value="year">Year</option>
-                                <option value="month">Month</option>
+                                <MenuItem value="year">Year</MenuItem>
+                                <MenuItem value="month">Month</MenuItem>
                             </Select>
-                        </Grid>
+                        </FormControl>
 
                         <Grid item>
                             <FormControlLabel
