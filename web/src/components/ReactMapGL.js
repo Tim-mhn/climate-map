@@ -19,8 +19,10 @@ export const RMapGL = () => {
     const iniViewport = {
         // width: 100,
         // height: 800, 
-        latitude: 37.7577,
-        longitude: -122.4376,
+        // height: "100vh",
+        // width: "100vw",
+        latitude: 40,
+        longitude: -100,
         zoom: 1
     }
 
@@ -150,8 +152,8 @@ export const RMapGL = () => {
                              */}
                             {fetchedAll ?
                                 <ReactMapGL
-                                    width='80vw'
-                                    height='80vh'
+                                    width='100vw'
+                                    height='100vh'
                                     {...viewport}
                                     onViewportChange={(vp) => setViewport(vp)}
                                     mapboxApiAccessToken={MAPBOX_TOKEN}>

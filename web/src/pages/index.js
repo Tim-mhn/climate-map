@@ -6,19 +6,27 @@ import {
 import { Container } from '../components/Container'
 import { DarkModeSwitch } from '../components/DarkModeSwitch'
 import { Footer } from '../components/Footer'
+import { RMapGL } from '../components/ReactMapGL'
 // import dotenv from 'dotenv'
 
 // dotenv.config()
 
 
 const Index = () => (
-  <Container>
-   
-    <DarkModeSwitch />
-    <Footer>
-      <Text>Next ❤️ Chakra NO RELOAD</Text>
-    </Footer>
-  </Container>
+  <React.Fragment>
+      <div
+        style={{
+          position: 'fixed',
+          width: '100vw',
+          height: 'inherit',
+          display: 'flex',
+          flexDirection: 'column', 
+          alignItems: 'stretch',
+        }}
+      >
+        <RMapGL/>
+        </div>
+      </React.Fragment>
 )
 
 export default Index
