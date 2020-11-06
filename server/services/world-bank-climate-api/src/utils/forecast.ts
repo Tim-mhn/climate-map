@@ -16,4 +16,4 @@ export function addAnnualVals(forecasts: MonthlyForecast[]) {
         return el
     })
 
-}
+}   

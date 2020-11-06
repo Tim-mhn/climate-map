@@ -1,37 +1,33 @@
 import { useGraphQL} from "./graphql"
 import { AlltimePrecipitationQuery, AlltimeTemperatureQuery } from "../graphql/queries/ForecastsQueries"
+import { useEffect, useState } from "react";
 
 
 
-function useCombineQueries() {
-    // const [avgLoading, avgError, avgData] = useGraphQL(AlltimeTemperatureQuery, { type: "avg" });
-    // const [anomLoading, anomError, anomData] = useGraphQL(AlltimePrecipitationQuery, { type: "anom" });
-
-    // let data;
-    // if (avgData && anomData) { 
-    //     console.log(avgData);
-    //     console.log(anomData)    
-    // };
-
-
-    // console.log(data);
-
-    // return data;
-
+const VARIABLE_TO_QUERY = {
+    "temperature": AlltimeTemperatureQuery,
+    "precipitation": AlltimePrecipitationQuery
 }
 
-
 export function useFetchAll() {
-    const [tLoading, tError, tData] = useGraphQL(AlltimeTemperatureQuery, { type: "avg" });
-    const [pLoading, pError, pData] = useGraphQL(AlltimePrecipitationQuery, { type: "avg" });
-    // useCombineQueries();
-    // console.log(tData);
-    // console.log(pData)
+    const [fetchedAll, setFetchedAll] = useState(false);
 
-    return {
-        "temperature": [tLoading, tError, tData],
-        "precipitation": [pLoading, pError, pData]
+    const graphqlRes = {};
+
+    for (const [variable, query] of Object.entries(VARIABLE_TO_QUERY)) {
+        const anomVariable = `${variable}Anom`;
+        graphqlRes[variable] = useGraphQL(query, { type: "avg"});
+        graphqlRes[anomVariable] = useGraphQL(query, { type: "anom"});
     }
+
+    
+    useEffect(() => {
+        if (fetchedAll) return;
+        if (Object.values(graphqlRes).every(res => res[2])) setFetchedAll(true)
+    }, [graphqlRes]);
+
+    
+    return [graphqlRes, fetchedAll];
 
 
 }

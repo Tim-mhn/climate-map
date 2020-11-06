@@ -11,7 +11,7 @@ import DiscreteSlider from './DiscreteSlider';
 import { useFetchAll } from '../hooks/fetch';
 import { DATA_LAYER_STOPS, DATA_LAYER_COLOURS, BASIC_REQ_TIME_PERIODS, MONTHS, MAPBOX_TOKEN } from '../utils/constants';
 import { useGraphQL } from '../hooks/graphql';
-import { AlltimeTemperatureQuery } from '../graphql/queries/ForecastsQueries';
+import { AlltimePrecipitationQuery, AlltimeTemperatureQuery } from '../graphql/queries/ForecastsQueries';
 
 export const RMapGL = () => {
 
@@ -29,32 +29,32 @@ export const RMapGL = () => {
     const [viewport, setViewport] = useState(iniViewport);
     const [input, setInput] = useForm({ fromYear: "2020", scenario: "a2", variable: "temperature", granulation: "year", "month": 0 });
 
-    // Fetch Temperature + Precipitation data
-    const { temperature, precipitation } = useFetchAll();
-    const [anomTLoading, anomTError, anomTData] = useGraphQL(AlltimeTemperatureQuery, { type: "anom" });
+    // Fetch all time Temperature + Precipitation average and anomaly  data
+    const [alltimeQueriesResp, fetchedAll] = useFetchAll();
 
-    const [tLoading, tError, tData] = temperature;
-    const [prLoading, prError, prData] = precipitation;
+
 
 
     // Load GeoJSON data of all countries only on startup
     useEffect(() => {
-        if (tData && prData) {
+        
+        if (fetchedAll) {
+            console.count("use effect called")
+            console.log(alltimeQueriesResp)
             getAllGeoJSONs().then(geojsons => {
-                let updatedFeatures = updateFeaturesCollection(geojsons, tData, "temperature");
-                updatedFeatures = updateFeaturesCollection(updatedFeatures, prData, "precipitation");
+                let updatedFeatures = geojsons;
+                
+                Object.entries(alltimeQueriesResp).forEach(([queryName, queryRes]) => {
+                    const [loading, error, data] = queryRes ;
+                    if (data) updatedFeatures = updateFeaturesCollection(updatedFeatures, data, queryName);
+                });
+
                 setFeaturesCollection(updatedFeatures);
                 setIniColourRender(iniColourRender + 1);
             });
         }
-    }, [tData, prData]);
+    }, [fetchedAll]);
 
-    useEffect(() => {
-        if (anomTData) {
-            addAnom(featuresCollection, "temperature", anomTData);
-        }
-
-    }, [anomTData, featuresCollection]);
     // Update "reference" value for country colouring on scenario update in featuresCollection
     useEffect(() => {
         if (featuresCollection) _updateColourRefValue(featuresCollection, input)
@@ -79,7 +79,7 @@ export const RMapGL = () => {
 
         if (featuresCollection) {
 
-            let stops = DATA_LAYER_STOPS[input.variable];
+            let stops = DATA_LAYER_STOPS[input.variable] ? DATA_LAYER_STOPS[input.variable] : DATA_LAYER_STOPS["default"] ;
             // Assert that stops and colours have same number of elements !
             if (stops.length != DATA_LAYER_COLOURS.length) {
                 throw Error(`Error in updating data layer paint. Stops and colours don't have same length ${DATA_LAYER_STOPS} --- ${DATA_LAYER_COLOURS}`);
@@ -125,9 +125,6 @@ export const RMapGL = () => {
     }
 
     const addAnom = (featuresColl, variable, anomData) =>  {
-        console.log(featuresColl);
-        console.log(anomData);
-        console.log(anomData.alltime_forecasts)
         if (!anomData || !featuresColl) return;
         for (const countryAnomData of anomData.alltime_forecasts) {
             let countryFeature = featuresColl.features.find(feat => feat.properties.ISO_A3 == countryAnomData.country);
@@ -156,7 +153,10 @@ export const RMapGL = () => {
                         {/* Map */}
 
                         <Grid item xs={8}>
-                            {tData && prData ?
+                            {/**TODO:
+                             * load map as soon as data for selected input is ready (average temperature on load)
+                             */}
+                            {fetchedAll ?
                                 <ReactMapGL
                                     width='99vw'
                                     height='94vh'
@@ -187,8 +187,10 @@ export const RMapGL = () => {
                                 defaultValue="temperature"
                                 onChange={setInput}
                             >
-                                <option value="precipitation">Precipitation</option>
-                                <option value="temperature">Temperature</option>
+                                { Object.keys(alltimeQueriesResp).map(queryName => {
+                                    return <option value={queryName}>{queryName}</option>
+                                })}
+
                             </Select>
                         </Grid>
 
