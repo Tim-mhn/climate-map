@@ -4,14 +4,15 @@ import { Select } from "@chakra-ui/core";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 import { getAllGeoJSONs } from '../utils/geojson'
 import { useForm } from '../hooks/form';
-import { updateFeaturesCollection } from '../utils/featuresCollection';
+import { anomToGross, getForecastValueFromProp, isInputVariableAnom, updateFeaturesCollection } from '../utils/featuresCollection';
 import DiscreteSlider from './DiscreteSlider';
 import { useFetchAll } from '../hooks/fetch';
 import { DATA_LAYER_STOPS, DATA_LAYER_COLOURS, BASIC_REQ_TIME_PERIODS, MONTHS, MAPBOX_TOKEN } from '../utils/constants';
-import { useGraphQL } from '../hooks/graphql';
-import { AlltimePrecipitationQuery, AlltimeTemperatureQuery } from '../graphql/queries/ForecastsQueries';
+import { isInputType } from 'graphql';
 
 export const RMapGL = () => {
 
@@ -27,7 +28,7 @@ export const RMapGL = () => {
     const [featuresCollection, setFeaturesCollection] = useState(null);
     const [iniColourRender, setIniColourRender] = useState(0);
     const [viewport, setViewport] = useState(iniViewport);
-    const [input, setInput] = useForm({ fromYear: "2020", scenario: "a2", variable: "temperature", granulation: "year", "month": 0 });
+    const [input, setInput] = useForm({ fromYear: "2020", scenario: "a2", variable: "temperature", granulation: "year", "month": 0, "relative": false });
 
     // Fetch all time Temperature + Precipitation average and anomaly  data
     const [alltimeQueriesResp, fetchedAll] = useFetchAll();
@@ -37,15 +38,15 @@ export const RMapGL = () => {
 
     // Load GeoJSON data of all countries only on startup
     useEffect(() => {
-        
+
         if (fetchedAll) {
-            console.count("use effect called")
-            console.log(alltimeQueriesResp)
+            console.count("Use effect called")
+            console.info(alltimeQueriesResp)
             getAllGeoJSONs().then(geojsons => {
                 let updatedFeatures = geojsons;
-                
+
                 Object.entries(alltimeQueriesResp).forEach(([queryName, queryRes]) => {
-                    const [loading, error, data] = queryRes ;
+                    const [loading, error, data] = queryRes;
                     if (data) updatedFeatures = updateFeaturesCollection(updatedFeatures, data, queryName);
                 });
 
@@ -79,7 +80,7 @@ export const RMapGL = () => {
 
         if (featuresCollection) {
 
-            let stops = DATA_LAYER_STOPS[input.variable] ? DATA_LAYER_STOPS[input.variable] : DATA_LAYER_STOPS["default"] ;
+            let stops = DATA_LAYER_STOPS[input.variable] ? DATA_LAYER_STOPS[input.variable] : DATA_LAYER_STOPS["default"];
             // Assert that stops and colours have same number of elements !
             if (stops.length != DATA_LAYER_COLOURS.length) {
                 throw Error(`Error in updating data layer paint. Stops and colours don't have same length ${DATA_LAYER_STOPS} --- ${DATA_LAYER_COLOURS}`);
@@ -87,52 +88,44 @@ export const RMapGL = () => {
             stops = stops.map((st, idx) => [st, DATA_LAYER_COLOURS[idx]]);
 
             dataLayer.paint['fill-color'].stops = stops;
-            console.log(featuresCollection)
         }
 
         return dataLayer
     }, [featuresCollection]);
 
 
+    const _getRelativeAnom = (featureProperties, input) => {
+        const anomProp = featureProperties[input.variable];
+        const grossPropName = anomToGross(input.variable);
+        const grossProp = featureProperties[grossPropName];
+        const grossValue = getForecastValueFromProp(grossProp, input)
+        const anomValue = getForecastValueFromProp(anomProp, input)
+        return anomValue / grossValue;
+
+
+    }
     // Set the value used for country colour by looking into property 
     // and finding the element that has field attribute = filterVal
     const _updateColourRefValue = (featuresColl, input) => {
+
         const featuresWithRefVal = featuresColl.features.map(feature => {
             let prop = feature.properties[input.variable];
-            const refKey = input.granulation == "year" ? "annualVal" : "monthVals"
 
-            const filter = (({ variable, granulation, month, ...o }) => o)(input) // Copy all key, values into filter except for "variable"
-
-            const idx = input.granulation == "year" ? 0 : input.month
-            // Find first element that matches all values in input (scenario, fromYear, ...)
             let refValue;
             try {
-                refValue = prop ? prop.find(el => Object.keys(filter).every(key => el[key] == filter[key]))[refKey][idx] : null;
+                refValue = (input.relative && isInputVariableAnom(input)) ? _getRelativeAnom(feature.properties, input) : getForecastValueFromProp(prop, input);
             } catch (e) {
-                console.error(e);
-                refValue = null;
-            }
+                console.error(e.message);
+                refValue = null
+            };
 
             const updatedProperties = { ...feature.properties, "value": refValue };
-
-
             return { ...feature, "properties": updatedProperties }
         });
 
+        console.info(featuresWithRefVal);
         const updatedFeaturesColl = { ...featuresColl, "features": featuresWithRefVal };
-        console.log(featuresWithRefVal)
         setFeaturesCollection(updatedFeaturesColl);
-    }
-
-    const addAnom = (featuresColl, variable, anomData) =>  {
-        if (!anomData || !featuresColl) return;
-        for (const countryAnomData of anomData.alltime_forecasts) {
-            let countryFeature = featuresColl.features.find(feat => feat.properties.ISO_A3 == countryAnomData.country);
-            console.log(countryAnomData);
-            console.log(countryFeature)
-            countryFeature.variable = { ...countryFeature.variable, }
-        }
-        return 1;
     }
 
 
@@ -168,10 +161,10 @@ export const RMapGL = () => {
                                         <Layer {...dataLayer}></Layer>
                                     </Source>
                                 </ReactMapGL>
-                                : 
-                                        <CircularProgress
-                                        size={100}
-                                    />
+                                :
+                                <CircularProgress
+                                    size={100}
+                                />
                             }
                         </Grid>
                     </Grid>
@@ -187,7 +180,7 @@ export const RMapGL = () => {
                                 defaultValue="temperature"
                                 onChange={setInput}
                             >
-                                { Object.keys(alltimeQueriesResp).map(queryName => {
+                                {Object.keys(alltimeQueriesResp).map(queryName => {
                                     return <option value={queryName}>{queryName}</option>
                                 })}
 
@@ -218,13 +211,29 @@ export const RMapGL = () => {
                                 <option value="month">Month</option>
                             </Select>
                         </Grid>
+
+                        <Grid item>
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        defaultChecked={false}
+                                        onChange={setInput}
+                                        name="relative"
+                                        color="primary"
+                                        disabled={!isInputVariableAnom(input)}
+                                    />
+                                }
+                                label="Relative anomaly"
+                            />
+                        </Grid>
+
                         <Grid item >
                             <DiscreteSlider
-                                    label="Period"
-                                    name="fromYear"
-                                    handleChange={setInput}
-                                    marks={periodMarks}
-                                />
+                                label="Period"
+                                name="fromYear"
+                                handleChange={setInput}
+                                marks={periodMarks}
+                            />
                         </Grid>
                         <Grid item >
                             {
@@ -242,9 +251,9 @@ export const RMapGL = () => {
                                     <span></span>
                             }
                         </Grid>
-                        </Grid>
-
                     </Grid>
+
+                </Grid>
 
             </Grid>
 

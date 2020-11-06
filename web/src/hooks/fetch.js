@@ -1,6 +1,7 @@
 import { useGraphQL} from "./graphql"
 import { AlltimePrecipitationQuery, AlltimeTemperatureQuery } from "../graphql/queries/ForecastsQueries"
 import { useEffect, useState } from "react";
+import { grossToAnom } from "../utils/featuresCollection";
 
 
 
@@ -15,7 +16,7 @@ export function useFetchAll() {
     const graphqlRes = {};
 
     for (const [variable, query] of Object.entries(VARIABLE_TO_QUERY)) {
-        const anomVariable = `${variable}Anom`;
+        const anomVariable = grossToAnom(variable);
         graphqlRes[variable] = useGraphQL(query, { type: "avg"});
         graphqlRes[anomVariable] = useGraphQL(query, { type: "anom"});
     }
@@ -23,6 +24,7 @@ export function useFetchAll() {
     
     useEffect(() => {
         if (fetchedAll) return;
+        /* Wait that all queries have loaded to update fetchedAll */
         if (Object.values(graphqlRes).every(res => res[2])) setFetchedAll(true)
     }, [graphqlRes]);
 
