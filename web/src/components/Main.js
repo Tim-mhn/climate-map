@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import ReactMapGL, { Source, Layer } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
