@@ -1,15 +1,4 @@
-import {
-  Link as ChakraLink,
-  Text,
-} from '@chakra-ui/core'
-
-import { Container } from '../components/Container'
-import { DarkModeSwitch } from '../components/DarkModeSwitch'
-import { Footer } from '../components/Footer'
-import { RMapGL } from '../components/ReactMapGL'
-// import dotenv from 'dotenv'
-
-// dotenv.config()
+import { Main } from '../components/Main'
 
 
 const Index = () => (
@@ -24,7 +13,7 @@ const Index = () => (
           alignItems: 'stretch',
         }}
       >
-        <RMapGL/>
+        <Main/>
         </div>
       </React.Fragment>
 )
