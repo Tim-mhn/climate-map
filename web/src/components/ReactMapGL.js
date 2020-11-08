@@ -11,21 +11,23 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Switch from '@material-ui/core/Switch';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
 import { getAllGeoJSONs } from '../utils/geojson'
 import { useForm } from '../hooks/form';
 import { anomToGross, getForecastValueFromProp, isInputVariableAnom, updateFeaturesCollection } from '../utils/featuresCollection';
 import DiscreteSlider from './DiscreteSlider';
 import { useFetchAll } from '../hooks/fetch';
 import { DATA_LAYER_STOPS, DATA_LAYER_COLOURS, BASIC_REQ_TIME_PERIODS, MONTHS, MAPBOX_TOKEN } from '../utils/constants';
+import SelectWrapper from './FormControl';
 
 
 export const RMapGL = () => {
 
     const iniViewport = {
-        // width: 100,
-        // height: 800, 
-        // height: "100vh",
-        // width: "100vw",
         latitude: 40,
         longitude: -100,
         zoom: 1
@@ -37,6 +39,10 @@ export const RMapGL = () => {
         },
         selectEmpty: {
             marginTop: theme.spacing(2),
+        },
+        root: {
+            minWidth: 100,
+            backgroundColor: "rgba(255, 255, 255, 0.85)"
         },
     }));
 
@@ -147,7 +153,7 @@ export const RMapGL = () => {
 
 
     const periodMarks = Object.entries(BASIC_REQ_TIME_PERIODS).map(([start, end]) => {
-        return { label: `${start}-${end}`, value: Number.parseInt(start) }
+        return { label: `${start}-${end.slice(-2)}`, value: Number.parseInt(start) }
     });
 
     const monthMarks = MONTHS.map((month, idx) => { return { "value": idx, "label": month } });
@@ -159,7 +165,7 @@ export const RMapGL = () => {
             <Grid container>
                 <Grid container item direction='row' xs={12} spacing={2}>
 
-                    <Grid container item direction='column' xs={10} spacing={2}>
+                    <Grid container item direction='column' xs={9} spacing={2}>
                         {/* Map */}
 
                         <Grid item xs={8}>
@@ -187,94 +193,104 @@ export const RMapGL = () => {
                     </Grid>
 
 
-                    <Grid container item direction='column' xs={2} spacing={1} justify='flex-start' style={{ 'zIndex': 999 }}>
+                    <Grid container item direction='column' xs={3} spacing={1} justify='flex-start' style={{ 'zIndex': 999, 'paddingTop': '48px', 'paddingRight': '24px' }}>
                         {/* Inputs */}
-
-                        <FormControl variant="outlined" className={classes.formControl}>
-                            <InputLabel id="variable-select-label">Variable</InputLabel>
-                            <Select
-                                labelId="variable-select-label"
-                                name="variable"
-                                label="variable"
-                                // placeholder="Select variable"
-                                defaultValue="temperature"
-                                onChange={setInput}
-                            >
-                                {Object.keys(alltimeQueriesResp).map(queryName => {
-                                    return <MenuItem value={queryName}>{queryName}</MenuItem>
-                                })}
-
-                            </Select>
-                        </FormControl>
-
-                        <FormControl variant="outlined" className={classes.formControl}>
-                            <InputLabel id="scenario-select-label">Variable</InputLabel>
-                            <Select
-                                name="scenario"
-                                label="scenario"
-                                labelId="scenario-select-label"
-                                placeholder="Select scenario"
-                                defaultValue="a2"
-                                onChange={setInput}
-                            >
-                                <MenuItem value="a2">a2</MenuItem>
-                                <MenuItem value="b1">b1</MenuItem>
-                            </Select>
-                        </FormControl>
-
-
-                        <FormControl variant="outlined" className={classes.formControl}>
-                            <InputLabel id="granulation-select-label">Variable</InputLabel>
-                            <Select
-                                name="granulation"
-                                label="granulation"
-                                labelId="granulation-select-label"                                defaultValue="year"
-                                onChange={setInput}
-                            >
-                                <MenuItem value="year">Year</MenuItem>
-                                <MenuItem value="month">Month</MenuItem>
-                            </Select>
-                        </FormControl>
-
-                        <Grid item>
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        defaultChecked={false}
-                                        onChange={setInput}
-                                        name="relative"
-                                        color="primary"
-                                        disabled={!isInputVariableAnom(input)}
-                                    />
-                                }
-                                label="Relative anomaly"
-                            />
-                        </Grid>
-
-                        <Grid item >
-                            <DiscreteSlider
-                                label="Period"
-                                name="fromYear"
-                                handleChange={setInput}
-                                marks={periodMarks}
-                            />
-                        </Grid>
-                        <Grid item >
-                            {
-                                input.granulation == "month" ?
-
-                                    <DiscreteSlider
-                                        label="Month"
-                                        name="month"
+                        <Card className={classes.root} >
+                            <CardContent>
+                                <Typography variant="body2" component="p">
+                                    <SelectWrapper
+                                        label="Variable"
+                                        name="variable"
+                                        defaultValue="temperature"
                                         handleChange={setInput}
-                                        marks={monthMarks}
-                                    />
+                                        items={Object.keys(alltimeQueriesResp).map(queryName => {
+                                            return { "value": queryName, "label": queryName }
+                                        })} />
 
-                                    :
+                                </Typography>
+                                <Typography variant="body2" component="p">
+                                    <SelectWrapper
+                                        label="Scenario"
+                                        name="scenario"
+                                        defaultValue="a2"
+                                        handleChange={setInput}
+                                        items={["a2", "b1"].map(scenario => {
+                                            return { "label": scenario, "value": scenario}
+                                        })} />
 
-                                    <span></span>
-                            }
-                        </Grid>
+                                </Typography>
+
+                                <Typography variant="body2" component="p">
+                                <SelectWrapper 
+                                        label="Granulation" 
+                                        name="granulation" 
+                                        defaultValue="year" 
+                                        handleChange={setInput}
+                                        items={["year", "month"].map(gran => {
+                                            return { "label": gran, "value": gran}
+                                        })} />
+
+                                </Typography>
+
+                                <Typography variant="body2" component="p">
+                                    <Grid item>
+                                        <FormControlLabel
+                                            control={
+                                                <Switch
+                                                    defaultChecked={false}
+                                                    onChange={setInput}
+                                                    name="relative"
+                                                    color="primary"
+                                                    disabled={!isInputVariableAnom(input)}
+                                                />
+                                            }
+                                            label="Relative anomaly"
+                                        />
+                                    </Grid>
+
+                                </Typography>
+
+                                <Typography variant="body2" component="p">
+                                    <Grid item >
+                                        <DiscreteSlider
+                                            label="Period"
+                                            name="fromYear"
+                                            handleChange={setInput}
+                                            marks={periodMarks}
+                                        />
+                                    </Grid>
+
+                                </Typography>
+
+                                <Typography variant="body2" component="p">
+                                    <Grid item >
+                                        {
+                                            input.granulation == "month" ?
+
+                                                <DiscreteSlider
+                                                    label="Month"
+                                                    name="month"
+                                                    handleChange={setInput}
+                                                    marks={monthMarks}
+                                                />
+
+                                                :
+
+                                                <span></span>
+                                        }
+                                    </Grid>
+
+                                </Typography>
+
+                            </CardContent>
+                            {/* <CardActions>
+                                <Button size="small">Learn More</Button>
+                            </CardActions> */}
+                        </Card>
+
+
+
+
                     </Grid>
 
                 </Grid>
@@ -284,6 +300,6 @@ export const RMapGL = () => {
         );
     }
 
-    return Map(); 
+    return Map();
 }
 
