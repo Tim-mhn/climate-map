@@ -11,6 +11,7 @@ import { useFetchAll } from '../hooks/fetch';
 import { DATA_LAYER_STOPS, DATA_LAYER_COLOURS, MAPBOX_TOKEN } from '../utils/constants';
 import InputBoard from './InputBoard';
 import ForecastMap from './Map';
+import { ColorLegend } from './ColorLegend';
 
 
 export const Main = () => {
@@ -95,7 +96,7 @@ export const Main = () => {
 
             dataLayer.paint['fill-color'].stops = stops;
         }
-
+        console.log(dataLayer)
         return dataLayer
     }, [featuresCollection]);
 
@@ -169,6 +170,8 @@ export const Main = () => {
                             input={input} 
                             setInput={setInput} 
                             alltimeQueriesResp={alltimeQueriesResp}/>
+
+                            <ColorLegend colorStops={dataLayer.paint["fill-color"].stops}/>
 
                     </Grid>
 
