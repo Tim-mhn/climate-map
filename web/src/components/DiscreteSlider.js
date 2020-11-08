@@ -8,6 +8,7 @@ const WIDTH = 300
 const useStyles = makeStyles({
   root: {
     width: WIDTH,
+    margin: '16px'
   },
 });
 
