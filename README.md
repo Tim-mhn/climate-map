@@ -2,14 +2,19 @@
 
 A world map to alert people on climate change consequences. Forecasts per country on various variables and models such as temperature, precipitation, dry days using mostly World bank Climate Api
 
-Building this with :
+Stack :
 
-**Server:** **Express**, **Typescript**, **GraphQL**
+#### Project Management
+[Trello](https://trello.com/b/Cb7wVbBb/kanban-template),
 
-**Front: React, Next.js, Chakra-UI, URQL, React Vector Map** 
+#### Server:
+Express, Typescript, GraphQL, Apollo Server
 
-Deploy:
+#### Client: 
+React, Next.js, MaterialUI, MapboxGL, Canvas API
 
-Public [Trello](https://trello.com/b/Cb7wVbBb/kanban-template)
+#### Devops:
+Docker, Dokku, DigitalOcean, Vercel
 
-Built wireframe with [Balsamiq](https://balsamiq.cloud/sj3epi0/pdvn82j)
+
+# [It's live !](https://ourclimate.live) but still wip ...
