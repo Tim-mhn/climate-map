@@ -78,7 +78,7 @@ export class AverageForecastResolver {
         let countryCodes: string[] = iso3 ? (toArray(iso3)) : await getIsoCodes();
 
         // Reduce query time when developing
-        if (test) countryCodes = countryCodes.slice(1, 3);
+        if (test) countryCodes = countryCodes.slice(1, 10);
 
         let countryPromises = countryCodes.map((code: string) => createAlltimeCountryPromise(url, code));
 

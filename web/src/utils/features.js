@@ -1,4 +1,5 @@
-import { VARIABLE_TO_UNIT } from "./constants";
+import { zip } from "./array";
+import {DATA_LAYER_SCALES, VARIABLE_TO_UNIT } from "./constants";
 
 
 export const updateFeaturesCollection = (featuresCollection, data, variable) => {
@@ -58,4 +59,19 @@ export const getForecastUnit = (variable, granulation) => {
                         ${err.message}`)
         return "[ERROR Unit]"
     }
+}
+
+export const getDalayerStops = (input) => {
+    const isAnom = input.variable.includes("Anom");
+    const isRelative = input.relative;
+    const grossVariable = anomToGross(input.variable);
+    const colours = DATA_LAYER_SCALES[grossVariable]["colours"];
+
+    const stopsKey = !isAnom ? "stops" : (isRelative ? "relativeAnomStops" : "anomStops");
+
+    const stops = DATA_LAYER_SCALES[grossVariable][stopsKey];
+
+    if (stops.length != colours.length) console.error("not same length !")
+
+    return zip(stops, colours);
 }

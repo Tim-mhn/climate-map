@@ -6,13 +6,13 @@ import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import { getAllGeoJSONs } from '../utils/geojson'
 import { useForm } from '../hooks/form';
-import { anomToGross, getForecastValueFromProp, isInputVariableAnom, updateFeaturesCollection } from '../utils/features';
+import { anomToGross, getDalayerStops, getForecastValueFromProp, isInputVariableAnom, updateFeaturesCollection } from '../utils/features';
 import { useFetchAll } from '../hooks/fetch';
-import { DATA_LAYER_STOPS, DATA_LAYER_COLOURS, MAPBOX_TOKEN } from '../utils/constants';
 import InputBoard from './InputBoard';
 import ForecastMap from './Map';
 import { ColorLegend } from './ColorLegend';
-
+import { arrAvg } from '../utils/array';
+  
 
 export const Main = () => {
 
@@ -86,14 +86,15 @@ export const Main = () => {
         };
 
         if (featuresCollection) {
+            // console.log(input)
+            // let stops = DATA_LAYER_STOPS[input.variable] ? DATA_LAYER_STOPS[input.variable] : DATA_LAYER_STOPS["default"];
+            // // Assert that stops and colours have same number of elements !
+            // if (stops.length != DATA_LAYER_COLOURS[input.variable].length) {
+            //     throw Error(`Error in updating data layer paint. Stops and colours don't have same length ${DATA_LAYER_STOPS} --- ${DATA_LAYER_COLOURS}`);
+            // }
+            // stops = stops.map((st, idx) => [st, DATA_LAYER_COLOURS[input.variable][idx]]);
 
-            let stops = DATA_LAYER_STOPS[input.variable] ? DATA_LAYER_STOPS[input.variable] : DATA_LAYER_STOPS["default"];
-            // Assert that stops and colours have same number of elements !
-            if (stops.length != DATA_LAYER_COLOURS.length) {
-                throw Error(`Error in updating data layer paint. Stops and colours don't have same length ${DATA_LAYER_STOPS} --- ${DATA_LAYER_COLOURS}`);
-            }
-            stops = stops.map((st, idx) => [st, DATA_LAYER_COLOURS[idx]]);
-
+            let stops = getDalayerStops(input);
             dataLayer.paint['fill-color'].stops = stops;
         }
         console.log(dataLayer)
@@ -113,13 +114,14 @@ export const Main = () => {
     // Set the value used for country colour by looking into property 
     // and finding the element that has field attribute = filterVal
     const _updateColourRefValue = (featuresColl, input) => {
-
+        let valBuff = [];
         const featuresWithRefVal = featuresColl.features.map(feature => {
             let prop = feature.properties[input.variable];
 
             let refValue;
             try {
                 refValue = (input.relative && isInputVariableAnom(input)) ? _getRelativeAnom(feature.properties, input) : getForecastValueFromProp(prop, input);
+                if (refValue) valBuff.push(refValue)
             } catch (e) {
                 console.error(e.message);
                 refValue = null
@@ -128,7 +130,9 @@ export const Main = () => {
             const updatedProperties = { ...feature.properties, "value": refValue };
             return { ...feature, "properties": updatedProperties }
         });
-
+        console.log(input)
+        console.log(valBuff)
+        console.log(Math.min(...valBuff), Math.max(...valBuff), arrAvg(valBuff))
         console.info(featuresWithRefVal);
         const updatedFeaturesColl = { ...featuresColl, "features": featuresWithRefVal };
         setFeaturesCollection(updatedFeaturesColl);
