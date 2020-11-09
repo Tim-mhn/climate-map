@@ -26,3 +26,7 @@ export const DATA_LAYER_COLOURS = ["#00FF7F", "#27dc54", "#3BCA6D", "#77945C", "
 
 export const MAPBOX_TOKEN = "pk.eyJ1IjoidGltaG4iLCJhIjoiY2tnbW1pZ2czMDVwYTJ1cXBkZzJjcXMxaCJ9.UNBlavlP3hhSmT5f7DRdBA";
 
+export const VARIABLE_TO_UNIT = {
+    "temperature": "°C",
+    "precipitation": "mm"
+}

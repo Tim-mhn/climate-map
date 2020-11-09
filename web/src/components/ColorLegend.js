@@ -1,6 +1,7 @@
 import { Card, CardContent, makeStyles, Typography } from "@material-ui/core";
 import React, { useEffect, useRef } from "react";
 import { normalizeArray, zip } from "../utils/array";
+import { getForecastUnit } from "../utils/features";
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -20,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export const ColorLegend = ({ colorStops, width, title }) => {
+export const ColorLegend = ({ colorStops, width, input }) => {
     const classes = useStyles();
 
     // we use a ref to access the canvas' DOM node
@@ -67,11 +68,12 @@ export const ColorLegend = ({ colorStops, width, title }) => {
         ctx.fillText(text, WIDTH + 15, 25);
     }, [canvasRef, colorStops]);
 
+    const unit = getForecastUnit(input.variable, input.granulation);
 
     return <Card className={classes.root} >
         <CardContent>
             <Typography variant="body2">
-                <p>{ title }</p>
+                <p>{ input.variable } { unit} </p>
                 <canvas ref={canvasRef} />
             </Typography>
         </CardContent>

@@ -1,3 +1,4 @@
+import { VARIABLE_TO_UNIT } from "./constants";
 
 
 export const updateFeaturesCollection = (featuresCollection, data, variable) => {
@@ -7,7 +8,7 @@ export const updateFeaturesCollection = (featuresCollection, data, variable) => 
         const countryForecast = data ? data.alltime_forecasts.find(fc => fc.country == iso3) : null;
 
         prop[variable] = countryForecast ? countryForecast.data : null;
-      
+        if (countryForecast) console.log(countryForecast);
         return { ...feature, "properties": prop }
     });
 
@@ -42,3 +43,19 @@ export const grossToAnom = (variableName) => `${variableName}Anom`;
 export const anomToGross = (anomVariableName) => anomVariableName.replace('Anom', '');
 
 export const isInputVariableAnom = (input) => input.variable.includes('Anom');
+
+export const getForecastUnit = (variable, granulation) => {
+    try {
+        if (variable in VARIABLE_TO_UNIT) return `${VARIABLE_TO_UNIT[variable]}/${granulation}`;
+        else {
+            for (const variableKey of Object.keys(VARIABLE_TO_UNIT)) {
+                if (variable.includes(variableKey)) return `${VARIABLE_TO_UNIT[variableKey]}/${granulation}`;
+            }
+            throw new Error("Could not find unit.")
+        } 
+    } catch (err) {
+        console.error( `Error in getting forecast unit. variable=${variable}; granulation=${granulation}\
+                        ${err.message}`)
+        return "[ERROR Unit]"
+    }
+}

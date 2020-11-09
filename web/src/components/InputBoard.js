@@ -6,7 +6,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import SelectWrapper from './FormControl';
-import { isInputVariableAnom } from '../utils/featuresCollection';
+import { isInputVariableAnom } from '../utils/features';
 import { BASIC_REQ_TIME_PERIODS, MONTHS } from '../utils/constants';
 import { FormControlLabel } from '@material-ui/core';
 import DiscreteSlider from './DiscreteSlider';

@@ -6,7 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import { getAllGeoJSONs } from '../utils/geojson'
 import { useForm } from '../hooks/form';
-import { anomToGross, getForecastValueFromProp, isInputVariableAnom, updateFeaturesCollection } from '../utils/featuresCollection';
+import { anomToGross, getForecastValueFromProp, isInputVariableAnom, updateFeaturesCollection } from '../utils/features';
 import { useFetchAll } from '../hooks/fetch';
 import { DATA_LAYER_STOPS, DATA_LAYER_COLOURS, MAPBOX_TOKEN } from '../utils/constants';
 import InputBoard from './InputBoard';
@@ -171,7 +171,7 @@ export const Main = () => {
                             setInput={setInput} 
                             alltimeQueriesResp={alltimeQueriesResp}/>
 
-                            <ColorLegend colorStops={dataLayer.paint["fill-color"].stops} width={280} title={input.variable}/>
+                            <ColorLegend colorStops={dataLayer.paint["fill-color"].stops} width={280} input={input}/>
 
                     </Grid>
 
