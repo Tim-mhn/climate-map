@@ -41,7 +41,7 @@ query AlltimeTemperatures($type: String) {
             toYear
             percentile
       },
-      error
+      error,
   }
 }`
 
@@ -57,6 +57,6 @@ query AlltimePrecipitations($type: String) {
             toYear
             percentile
       },
-      error
+      error,
   }
 }`

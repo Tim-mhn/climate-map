@@ -1,3 +1,5 @@
+import { zip } from "./array";
+import {DATA_LAYER_SCALES, VARIABLE_TO_UNIT } from "./constants";
 
 
 export const updateFeaturesCollection = (featuresCollection, data, variable) => {
@@ -7,7 +9,7 @@ export const updateFeaturesCollection = (featuresCollection, data, variable) => 
         const countryForecast = data ? data.alltime_forecasts.find(fc => fc.country == iso3) : null;
 
         prop[variable] = countryForecast ? countryForecast.data : null;
-      
+        if (countryForecast) console.log(countryForecast);
         return { ...feature, "properties": prop }
     });
 
@@ -42,3 +44,28 @@ export const grossToAnom = (variableName) => `${variableName}Anom`;
 export const anomToGross = (anomVariableName) => anomVariableName.replace('Anom', '');
 
 export const isInputVariableAnom = (input) => input.variable.includes('Anom');
+
+export const getForecastUnit = (variable, granulation) => {
+    try {
+        const grossVariable = anomToGross(variable);
+        return VARIABLE_TO_UNIT[grossVariable];
+    } catch (err) {
+        console.error( `Error in getting forecast unit. variable=${variable}; granulation=${granulation}\
+                        ${err.message}`)
+        return "[default unit]"
+    }
+}
+
+export const getDataLayerStops = (input) => {
+    const isAnom = input.variable.includes("Anom");
+    const isRelative = input.relative;
+    const grossVariable = anomToGross(input.variable);
+    const colours = DATA_LAYER_SCALES[grossVariable]["colours"];
+
+    const stopsKey = !isAnom ? "stops" : (isRelative ? "relativeAnomStops" : "anomStops");
+    const stops = DATA_LAYER_SCALES[grossVariable][stopsKey];
+
+    if (stops.length != colours.length) console.error("Stops and colours don't have same length !")
+
+    return zip(stops, colours);
+}

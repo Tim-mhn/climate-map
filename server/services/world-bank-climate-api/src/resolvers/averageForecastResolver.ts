@@ -3,7 +3,6 @@ import { CountryBaseForecast } from "../entities/CountryForecast";
 import { getIsoCodes } from '../utils/isoCodes';
 import { BASIC_REQ_TIME_PERIODS } from '../utils/constants';
 import { BasicCountryRequestResponse, ExtendedForecast, MonthlyForecast } from "../models/interfaces";
-import { addAnnualVals } from '../utils/forecast';
 import { arrayFlatten } from "../utils/array";
 import { createCountryPromise } from "../utils/promises";
 
@@ -38,7 +37,6 @@ export class AverageForecastResolver {
         // Reduce query time when developing
         if (test) countryCodes = countryCodes.slice(1, 10);
 
-
         let countryPromises: Promise<any>[] = countryCodes.map((code: string) => createCountryPromise(url, code));
 
         return Promise.all(countryPromises)
@@ -54,7 +52,7 @@ export class AverageForecastResolver {
                         "data": countryFcs, 
                         "type": type, 
                         "variable": variable,
-                        "error" : errorMsg
+                        "error" : errorMsg,
                     }
                 });
 
@@ -80,7 +78,7 @@ export class AverageForecastResolver {
         let countryCodes: string[] = iso3 ? (toArray(iso3)) : await getIsoCodes();
 
         // Reduce query time when developing
-        if (test) countryCodes = countryCodes.slice(1, 3);
+        if (test) countryCodes = countryCodes.slice(1, 30);
 
         let countryPromises = countryCodes.map((code: string) => createAlltimeCountryPromise(url, code));
 
@@ -93,7 +91,8 @@ export class AverageForecastResolver {
                         "data": success ? countryFcs : null, 
                         "type": type, 
                         "variable": variable, 
-                        "error": success ? null : countryFcs
+                        "error": success ? null : countryFcs,
+                        // "unit": unit
                     }
                 });
 

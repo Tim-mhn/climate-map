@@ -1,3 +1,5 @@
+import { linearScale } from "./array";
+
 // Time periods allowed for start, end dates in climate API basic requests
 export const BASIC_REQ_TIME_PERIODS = {
     "2020": "2039",
@@ -17,12 +19,39 @@ export const DERIVED_REQ_TIME_PERIODS = {
     "2081": "2100"
 }
 
-export const DATA_LAYER_STOPS = {
-    "temperature": [-2, -1, 3, 6, 9, 13, 17, 21, 25, 29],
-    "precipitation": [300, 600, 900, 1200, 1500, 1800, 2100, 2400, 2700, 3000],
-    "default": [-0.8, -0.6, -0.4, -0.2, 0, 0.2, 0.4, 0.6, 0.8, 1]
-};
-export const DATA_LAYER_COLOURS = ["#00FF7F", "#27dc54", "#3BCA6D", "#77945C", "#818a77", "#B25F4A", "#ED2938", "#ed1524", "#f70110", "#ff0000"];
+
+const STOPS_COUNT = 10;
+
+export const DATA_LAYER_SCALES = {
+    "temperature": {
+        "colours": ["#8D8D8D", "#BA77D7", "#A20FE2", 
+                    "#0004CE", "#00CAD8", "#12BD2B", "#E3DB00", 
+                    "#DE8B00", "#C73C00", "#460B0A"],
+        "stops": linearScale(-2, 29, STOPS_COUNT),
+        "anomStops": linearScale(-3, 6, STOPS_COUNT),
+        "relativeAnomStops": linearScale(-1, 1, STOPS_COUNT, false)
+    },
+    "precipitation": {
+        "colours": ["#67001F", "#B2172B", "#D6604D", "#FDDBC7", 
+                    "#F8F8F8", "#D1E5F0", "#92C5DF", "#4393C3", 
+                    "#2166AC", "#053061"],
+        "stops": linearScale(0, 350, STOPS_COUNT),
+        "anomStops": linearScale(-20, 30, STOPS_COUNT),
+        "relativeAnomStops":linearScale(-.3, .3, STOPS_COUNT, false)
+    },
+    "default": {
+        "colours": ["#00FF7F", "#27dc54", "#3BCA6D", "#77945C", 
+                    "#818a77", "#B25F4A", "#ED2938", "#ed1524", 
+                    "#f70110", "#ff0000"],
+        "stops": [],
+        "anomStops": [],
+        "relativeAnomStops": []
+    }
+}
 
 export const MAPBOX_TOKEN = "pk.eyJ1IjoidGltaG4iLCJhIjoiY2tnbW1pZ2czMDVwYTJ1cXBkZzJjcXMxaCJ9.UNBlavlP3hhSmT5f7DRdBA";
 
+export const VARIABLE_TO_UNIT = {
+    "temperature": "°C",
+    "precipitation": "mm/month"
+}

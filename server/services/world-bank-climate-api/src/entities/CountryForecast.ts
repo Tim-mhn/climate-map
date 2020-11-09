@@ -13,6 +13,7 @@ export class CountryBaseForecast {
   @Field(() => String, { nullable: true})
   error: string;
 
+
 }
 
 @ObjectType()

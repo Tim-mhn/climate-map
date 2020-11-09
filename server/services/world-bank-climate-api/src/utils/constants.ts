@@ -10,5 +10,6 @@ export const BASIC_REQ_TIME_PERIODS: string[][] = [
 export const DERIVED_REQ_TIME_PERIODS: string[][] = [
     ["2046", "2065"],
     ["2081", "2100"]
-]
+];
+
 

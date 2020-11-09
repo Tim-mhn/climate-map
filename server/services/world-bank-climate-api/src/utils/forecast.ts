@@ -1,5 +1,5 @@
 import { AnnualForecast, MonthlyForecast } from "../models/interfaces";
-import { arraySum } from "./array";
+import { arrayAvg } from "./array";
 
 export function getMonthAnnualVal(fc :AnnualForecast | MonthlyForecast) {
     /**
@@ -12,8 +12,9 @@ export function getMonthAnnualVal(fc :AnnualForecast | MonthlyForecast) {
 
 export function addAnnualVals(forecasts: MonthlyForecast[]) {
     return forecasts.map((el: any) => {
-        el = {...el, annualVal: [arraySum(el.monthVals)]}
+        el = {...el, annualVal: [arrayAvg(el.monthVals)]}
         return el
     })
 
-}   
+}
+

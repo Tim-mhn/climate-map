@@ -2,7 +2,7 @@ import { loadJson } from "./promises";
 
 
 const ISO3_ENDPOINTS = "http://countries.petethompson.net/data/countries.json"
-const MIN_RELEVANCE = 2;
+const MIN_RELEVANCE = 0.5;
 
 let iso3Codes: string[] = [];
 

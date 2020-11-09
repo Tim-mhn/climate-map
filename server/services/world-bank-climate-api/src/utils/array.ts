@@ -18,3 +18,5 @@ export function arraySum(arr: number[]) {
 export function arrayFlatten(nestedArr: any[][]) {
     return nestedArr.reduce((prev, curr) => prev.concat(curr), []);
 }
+
+export const arrayAvg = (arr) => arr.reduce((prev, el) => prev + el/arr.length, 0)
