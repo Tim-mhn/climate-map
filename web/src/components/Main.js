@@ -171,7 +171,7 @@ export const Main = () => {
                             setInput={setInput} 
                             alltimeQueriesResp={alltimeQueriesResp}/>
 
-                            <ColorLegend colorStops={dataLayer.paint["fill-color"].stops}/>
+                            <ColorLegend colorStops={dataLayer.paint["fill-color"].stops} width={280} title={input.variable}/>
 
                     </Grid>
 

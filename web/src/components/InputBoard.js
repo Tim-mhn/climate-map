@@ -38,7 +38,7 @@ export default function InputBoard({input, setInput, alltimeQueriesResp}) {
     
     return <Card className={classes.root} >
         <CardContent>
-            <Typography variant="body2" component="p">
+            <Typography variant="body2">
                 <SelectWrapper
                     label="Variable"
                     name="variable"
@@ -49,7 +49,7 @@ export default function InputBoard({input, setInput, alltimeQueriesResp}) {
                     })} />
 
             </Typography>
-            <Typography variant="body2" component="p">
+            <Typography variant="body2">
                 <SelectWrapper
                     label="Scenario"
                     name="scenario"
@@ -61,7 +61,7 @@ export default function InputBoard({input, setInput, alltimeQueriesResp}) {
 
             </Typography>
 
-            <Typography variant="body2" component="p">
+            <Typography variant="body2">
                 <SelectWrapper
                     label="Granulation"
                     name="granulation"
@@ -73,7 +73,7 @@ export default function InputBoard({input, setInput, alltimeQueriesResp}) {
 
             </Typography>
 
-            <Typography variant="body2" component="p">
+            <Typography variant="body2" >
                 <Grid item>
                     <FormControlLabel
                         control={
@@ -91,7 +91,7 @@ export default function InputBoard({input, setInput, alltimeQueriesResp}) {
 
             </Typography>
 
-            <Typography variant="body2" component="p">
+            <Typography variant="body2">
                 <Grid item >
                     <DiscreteSlider
                         label="Period"
@@ -103,7 +103,7 @@ export default function InputBoard({input, setInput, alltimeQueriesResp}) {
 
             </Typography>
 
-            <Typography variant="body2" component="p">
+            <Typography variant="body2">
                 <Grid item >
                     {
                         input.granulation == "month" ?

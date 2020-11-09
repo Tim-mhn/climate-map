@@ -39,7 +39,7 @@ export default function SelectWrapper({label, name, defaultValue, handleChange, 
             onChange={handleChange}
         >
             {items.map((item, idx) => {
-                return <MenuItem id={idx} value={item.value}>{item.label}</MenuItem>
+                return <MenuItem key={idx} value={item.value}>{item.label}</MenuItem>
             })}
 
         </Select>
