@@ -47,31 +47,25 @@ export const isInputVariableAnom = (input) => input.variable.includes('Anom');
 
 export const getForecastUnit = (variable, granulation) => {
     try {
-        if (variable in VARIABLE_TO_UNIT) return `${VARIABLE_TO_UNIT[variable]}/${granulation}`;
-        else {
-            for (const variableKey of Object.keys(VARIABLE_TO_UNIT)) {
-                if (variable.includes(variableKey)) return `${VARIABLE_TO_UNIT[variableKey]}/${granulation}`;
-            }
-            throw new Error("Could not find unit.")
-        } 
+        const grossVariable = anomToGross(variable);
+        return VARIABLE_TO_UNIT[grossVariable];
     } catch (err) {
         console.error( `Error in getting forecast unit. variable=${variable}; granulation=${granulation}\
                         ${err.message}`)
-        return "[ERROR Unit]"
+        return "[default unit]"
     }
 }
 
-export const getDalayerStops = (input) => {
+export const getDataLayerStops = (input) => {
     const isAnom = input.variable.includes("Anom");
     const isRelative = input.relative;
     const grossVariable = anomToGross(input.variable);
     const colours = DATA_LAYER_SCALES[grossVariable]["colours"];
 
     const stopsKey = !isAnom ? "stops" : (isRelative ? "relativeAnomStops" : "anomStops");
-
     const stops = DATA_LAYER_SCALES[grossVariable][stopsKey];
 
-    if (stops.length != colours.length) console.error("not same length !")
+    if (stops.length != colours.length) console.error("Stops and colours don't have same length !")
 
     return zip(stops, colours);
 }

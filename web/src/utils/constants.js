@@ -53,5 +53,5 @@ export const MAPBOX_TOKEN = "pk.eyJ1IjoidGltaG4iLCJhIjoiY2tnbW1pZ2czMDVwYTJ1cXBk
 
 export const VARIABLE_TO_UNIT = {
     "temperature": "°C",
-    "precipitation": "mm"
+    "precipitation": "mm/month"
 }

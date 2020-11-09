@@ -45,7 +45,6 @@ export const ColorLegend = ({ colorStops, width, input }) => {
 
         for (const [value, color] of zip(normalizedStopVals, colors)) {
             try {
-                value = Math.min(1, value + Math.random() * 0.2);
                 gradient.addColorStop(value, color);
             } catch (err) {
                 console.error(`ColorLegend.js: error when adding color stop. \
@@ -57,9 +56,6 @@ export const ColorLegend = ({ colorStops, width, input }) => {
         // Set the fill style and draw a rectangle
         ctx.fillStyle = gradient;
         ctx.fillRect(10, 10, width, 20);
-        // ctx.strokeStyle = "green";
-        // ctx.strokeRect(10, 70, WIDTH, 30);
-        // ctx.clearRect(0, 0, canvasRef.width, canvasRef.height);   
         ctx.font = '18px serif';
         ctx.fillStyle = 'black';
         // console.log(stopValues);

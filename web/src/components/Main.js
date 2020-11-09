@@ -6,7 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import { getAllGeoJSONs } from '../utils/geojson'
 import { useForm } from '../hooks/form';
-import { anomToGross, getDalayerStops, getForecastValueFromProp, isInputVariableAnom, updateFeaturesCollection } from '../utils/features';
+import { anomToGross, getDataLayerStops, getForecastValueFromProp, isInputVariableAnom, updateFeaturesCollection } from '../utils/features';
 import { useFetchAll } from '../hooks/fetch';
 import InputBoard from './InputBoard';
 import ForecastMap from './Map';
@@ -94,7 +94,7 @@ export const Main = () => {
             // }
             // stops = stops.map((st, idx) => [st, DATA_LAYER_COLOURS[input.variable][idx]]);
 
-            let stops = getDalayerStops(input);
+            let stops = getDataLayerStops(input);
             dataLayer.paint['fill-color'].stops = stops;
         }
         console.log(dataLayer)
