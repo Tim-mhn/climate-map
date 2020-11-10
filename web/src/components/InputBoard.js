@@ -6,10 +6,11 @@ import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import SelectWrapper from './FormControl';
-import { isInputVariableAnom } from '../utils/features';
+import { isInputVariableAnom } from '../utils/string';
 import { BASIC_REQ_TIME_PERIODS, MONTHS } from '../utils/constants';
 import { FormControlLabel } from '@material-ui/core';
 import DiscreteSlider from './DiscreteSlider';
+import { camelToSentence } from '../utils/string';
 
 const useStyles = makeStyles((theme) => ({
         formControl: {
@@ -45,7 +46,7 @@ export default function InputBoard({input, setInput, alltimeQueriesResp}) {
                     defaultValue="temperature"
                     handleChange={setInput}
                     items={Object.keys(alltimeQueriesResp).map(queryName => {
-                        return { "value": queryName, "label": queryName }
+                        return { "value": queryName, "label": camelToSentence(queryName) }
                     })} />
 
             </Typography>

@@ -45,7 +45,6 @@ export default function DiscreteSlider({label, handleChange, name, marks}) {
         getAriaValueText={valuetext}
         aria-labelledby="discrete-slider-restrict"
         step={null}
-        valueLabelDisplay="auto"
         name={name}
         onChangeCommitted={(_, v) => {
           const event = { "target": { "name": name, "value": v.toString()} };

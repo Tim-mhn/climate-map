@@ -5,13 +5,12 @@ import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import { getAllGeoJSONs } from '../utils/geojson'
 import { useForm } from '../hooks/form';
-import { anomToGross, getDataLayerStops, getForecastValueFromProp, isInputVariableAnom, updateFeaturesCollection } from '../utils/features';
+import { anomToGross, isInputVariableAnom } from '../utils/string';
 import { useFetchAll } from '../hooks/fetch';
 import InputBoard from './InputBoard';
 import ForecastMap from './Map';
 import { ColorLegend } from './ColorLegend';
-import { arrAvg } from '../utils/array';
-  
+import { getDataLayerStops, getForecastValueFromProp, updateFeaturesCollection } from '../utils/features'
 
 export const Main = () => {
 
@@ -85,18 +84,11 @@ export const Main = () => {
         };
 
         if (featuresCollection) {
-            // console.log(input)
-            // let stops = DATA_LAYER_STOPS[input.variable] ? DATA_LAYER_STOPS[input.variable] : DATA_LAYER_STOPS["default"];
-            // // Assert that stops and colours have same number of elements !
-            // if (stops.length != DATA_LAYER_COLOURS[input.variable].length) {
-            //     throw Error(`Error in updating data layer paint. Stops and colours don't have same length ${DATA_LAYER_STOPS} --- ${DATA_LAYER_COLOURS}`);
-            // }
-            // stops = stops.map((st, idx) => [st, DATA_LAYER_COLOURS[input.variable][idx]]);
 
             let stops = getDataLayerStops(input);
             dataLayer.paint['fill-color'].stops = stops;
         }
-        console.log(dataLayer)
+
         return dataLayer
     }, [featuresCollection]);
 
@@ -129,10 +121,6 @@ export const Main = () => {
             const updatedProperties = { ...feature.properties, "value": refValue };
             return { ...feature, "properties": updatedProperties }
         });
-        console.log(input)
-        console.log(valBuff)
-        console.log(Math.min(...valBuff), Math.max(...valBuff), arrAvg(valBuff))
-        console.info(featuresWithRefVal);
         const updatedFeaturesColl = { ...featuresColl, "features": featuresWithRefVal };
         setFeaturesCollection(updatedFeaturesColl);
     }
@@ -157,6 +145,7 @@ export const Main = () => {
                                 <ForecastMap 
                                     featuresCollection={featuresCollection} 
                                     dataLayer={dataLayer}
+                                    input={input}
                                     />
                                 :
                                 <CircularProgress
@@ -174,7 +163,11 @@ export const Main = () => {
                             setInput={setInput} 
                             alltimeQueriesResp={alltimeQueriesResp}/>
 
-                            <ColorLegend colorStops={dataLayer.paint["fill-color"].stops} width={280} input={input}/>
+                            <ColorLegend 
+                                colorStops={dataLayer.paint["fill-color"].stops} 
+                                width={280} 
+                                input={input}
+                                />
 
                     </Grid>
 

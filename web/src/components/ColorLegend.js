@@ -30,7 +30,6 @@ export const ColorLegend = ({ colorStops, width, input }) => {
     useEffect(() => {
 
         const ctx = canvasRef.current.getContext("2d");
-        console.log(canvasRef.current.width)
         ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
         canvasRef.current.setAttribute('width', '475');
 
@@ -58,9 +57,7 @@ export const ColorLegend = ({ colorStops, width, input }) => {
         ctx.fillRect(10, 10, width, 20);
         ctx.font = '18px serif';
         ctx.fillStyle = 'black';
-        // console.log(stopValues);
         const text = `${stopValues[0]}-${stopValues[stopValues.length - 1]}`;
-        console.log(text)
         ctx.fillText(text, WIDTH + 15, 25);
     }, [canvasRef, colorStops]);
 
