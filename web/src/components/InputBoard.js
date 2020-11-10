@@ -32,6 +32,10 @@ const periodMarks = Object.entries(BASIC_REQ_TIME_PERIODS).map(([start, end]) =>
 
 const monthMarks = MONTHS.map((month, idx) => { return { "value": idx, "label": month } });
 
+const scenarioOptions = [ 
+    { "label" : "Business as usual (A2 Scenario)", "value": "a2"},
+    { "label" : "Ecological Development (B1 Scenario)", "value": "b1"},
+]
 export default function InputBoard({input, setInput, alltimeQueriesResp}) {
 
 
@@ -56,9 +60,7 @@ export default function InputBoard({input, setInput, alltimeQueriesResp}) {
                     name="scenario"
                     defaultValue="a2"
                     handleChange={setInput}
-                    items={["a2", "b1"].map(scenario => {
-                        return { "label": scenario, "value": scenario }
-                    })} />
+                    items={scenarioOptions} />
 
             </Typography>
 
