@@ -1,0 +1,22 @@
+.tooltip {
+    position: absolute;
+    margin: 8px;
+    padding: 4px;
+    padding-left: 8px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    min-width: 250px;
+    max-width: 250px;
+    min-height: 70px;
+    max-height: 70px;
+    font-size: 14px;
+    z-index: 9;
+    pointer-events: none;
+    border-radius: 2px;
+    box-shadow: 2px 2px 1px #A9A9A9;
+}
+
+.tooltip-header {
+    font-size: 24px;
+}
+

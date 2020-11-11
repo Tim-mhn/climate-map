@@ -1,5 +1,6 @@
 import { zip } from "./array";
 import {DATA_LAYER_SCALES, VARIABLE_TO_UNIT } from "./constants";
+import { anomToGross } from "./string";
 
 
 export const updateFeaturesCollection = (featuresCollection, data, variable) => {
@@ -38,12 +39,6 @@ export const getForecastValueFromProp = (property, input) => {
     return forecast ? forecast[refKey][idx] : null;
 }
 
-// 'temperature' -> 'temperatureAnom'
-export const grossToAnom = (variableName) => `${variableName}Anom`;
-// 'temperatureAnom' -> 'temperature'
-export const anomToGross = (anomVariableName) => anomVariableName.replace('Anom', '');
-
-export const isInputVariableAnom = (input) => input.variable.includes('Anom');
 
 export const getForecastUnit = (variable, granulation) => {
     try {

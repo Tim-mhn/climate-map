@@ -14,7 +14,7 @@ async function startServer() {
   });
 
   const app = express();
-
+  app.set("proxy", 1);
   const server = new ApolloServer({
     schema
   });

@@ -6,10 +6,11 @@ import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import SelectWrapper from './FormControl';
-import { isInputVariableAnom } from '../utils/features';
+import { isInputVariableAnom } from '../utils/string';
 import { BASIC_REQ_TIME_PERIODS, MONTHS } from '../utils/constants';
 import { FormControlLabel } from '@material-ui/core';
 import DiscreteSlider from './DiscreteSlider';
+import { camelToSentence } from '../utils/string';
 
 const useStyles = makeStyles((theme) => ({
         formControl: {
@@ -31,6 +32,10 @@ const periodMarks = Object.entries(BASIC_REQ_TIME_PERIODS).map(([start, end]) =>
 
 const monthMarks = MONTHS.map((month, idx) => { return { "value": idx, "label": month } });
 
+const scenarioOptions = [ 
+    { "label" : "Business as usual (A2 Scenario)", "value": "a2"},
+    { "label" : "Ecological Development (B1 Scenario)", "value": "b1"},
+]
 export default function InputBoard({input, setInput, alltimeQueriesResp}) {
 
 
@@ -45,7 +50,7 @@ export default function InputBoard({input, setInput, alltimeQueriesResp}) {
                     defaultValue="temperature"
                     handleChange={setInput}
                     items={Object.keys(alltimeQueriesResp).map(queryName => {
-                        return { "value": queryName, "label": queryName }
+                        return { "value": queryName, "label": camelToSentence(queryName) }
                     })} />
 
             </Typography>
@@ -55,9 +60,7 @@ export default function InputBoard({input, setInput, alltimeQueriesResp}) {
                     name="scenario"
                     defaultValue="a2"
                     handleChange={setInput}
-                    items={["a2", "b1"].map(scenario => {
-                        return { "label": scenario, "value": scenario }
-                    })} />
+                    items={scenarioOptions} />
 
             </Typography>
 

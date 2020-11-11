@@ -1,7 +1,7 @@
 import { useGraphQL} from "./graphql"
 import { AlltimePrecipitationQuery, AlltimeTemperatureQuery } from "../graphql/queries/ForecastsQueries"
 import { useEffect, useState } from "react";
-import { grossToAnom } from "../utils/features";
+import { grossToAnom } from "../utils/string";
 
 
 

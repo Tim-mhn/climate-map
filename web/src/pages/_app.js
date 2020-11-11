@@ -1,6 +1,7 @@
 import { ThemeProvider, CSSReset, ColorModeProvider } from '@chakra-ui/core'
 import { ApolloClient, InMemoryCache, ApolloProvider  } from '@apollo/client';
 import theme from '../theme'
+import '../styles/map-tooltip.css';
 
 console.debug(`connecting to Apollo client with ${process.env.NEXT_PUBLIC_CLIMATE_API_URL}`);
 const client = new ApolloClient({
