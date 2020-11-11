@@ -22,7 +22,6 @@ export default function ForecastMap({featuresCollection, dataLayer, input}) {
           srcEvent: {offsetX, offsetY}
         } = event;
         const hoverFeature = features && features.find(f => f.layer.id === 'data');
-        if (hoverFeature) console.log(hoverFeature)
         setHoverState({ hoverFeature, hoverX: offsetX, hoverY: offsetY})
       };
 

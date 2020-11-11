@@ -2,6 +2,7 @@ import { useGraphQL} from "./graphql"
 import { AlltimePrecipitationQuery, AlltimeTemperatureQuery } from "../graphql/queries/ForecastsQueries"
 import { useEffect, useState } from "react";
 import { grossToAnom } from "../utils/string";
+import { GraphQLError } from "graphql";
 
 
 
@@ -11,8 +12,7 @@ const VARIABLE_TO_QUERY = {
 }
 
 export function useFetchAll() {
-    const [fetchedAll, setFetchedAll] = useState(false);
-
+    const [resolvedQueriesCount, setResolvedQueriesCount] = useState(0);
     const graphqlRes = {};
 
     for (const [variable, query] of Object.entries(VARIABLE_TO_QUERY)) {
@@ -23,13 +23,14 @@ export function useFetchAll() {
 
     
     useEffect(() => {
-        if (fetchedAll) return;
-        /* Wait that all queries have loaded to update fetchedAll */
-        if (Object.values(graphqlRes).every(res => res[2])) setFetchedAll(true)
+        if (resolvedQueriesCount == Object.keys(graphqlRes).length) return
+        // Resolves queries have data (2nd element) not null
+        const _resolvedQueriesCount = Object.values(graphqlRes).filter(res => res[2]).length;
+        // Send signal if we've resolved some new queries
+        if (_resolvedQueriesCount > resolvedQueriesCount) setResolvedQueriesCount(_resolvedQueriesCount);
     }, [graphqlRes]);
 
-    
-    return [graphqlRes, fetchedAll];
+    return [graphqlRes, resolvedQueriesCount];
 
 
 }

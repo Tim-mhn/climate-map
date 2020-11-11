@@ -27,7 +27,7 @@ export const DATA_LAYER_SCALES = {
         "colours": ["#8D8D8D", "#BA77D7", "#A20FE2", 
                     "#0004CE", "#00CAD8", "#12BD2B", "#E3DB00", 
                     "#DE8B00", "#C73C00", "#460B0A"],
-        "stops": linearScale(-2, 29, STOPS_COUNT),
+        "stops": linearScale(-5, 30, STOPS_COUNT),
         "anomStops": linearScale(-3, 6, STOPS_COUNT),
         "relativeAnomStops": linearScale(-1, 1, STOPS_COUNT, false)
     },

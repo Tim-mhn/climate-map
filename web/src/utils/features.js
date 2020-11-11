@@ -5,17 +5,18 @@ import { anomToGross } from "./string";
 
 export const updateFeaturesCollection = (featuresCollection, data, variable) => {
     const featuresWithPrecipitation = featuresCollection.features.map(feature =>  {
+        // Ignore if variable has already been loaded for this country
+        // if (variable in prop) return feature;
         let prop = feature.properties;
         const iso3 = prop.ISO_A3;
         const countryForecast = data ? data.alltime_forecasts.find(fc => fc.country == iso3) : null;
 
         prop[variable] = countryForecast ? countryForecast.data : null;
-        if (countryForecast) console.log(countryForecast);
         return { ...feature, "properties": prop }
-    });
-
+        });
 
     return { ...featuresCollection, "features": featuresWithPrecipitation };
+
 }
 
 

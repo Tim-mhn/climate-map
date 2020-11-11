@@ -28,38 +28,53 @@ export const Main = () => {
         },
     }));
 
-    const classes = useStyles();
+    const classes2 = useStyles();
 
 
     const [featuresCollection, setFeaturesCollection] = useState(null);
-    const [iniColourRender, setIniColourRender] = useState(0);
+    const [iniColourRender, setIniColourRender] = useState(false);
     const [input, setInput] = useForm({ fromYear: "2020", scenario: "a2", variable: "temperature", granulation: "year", "month": 0, "relative": false });
 
-    // Fetch all time Temperature + Precipitation average and anomaly  data
-    const [alltimeQueriesResp, fetchedAll] = useFetchAll();
+    // Fetch all time Temperature + Precipitation average and anomaly data
+    const [alltimeQueriesResp, resolvedQueriesCount] = useFetchAll();
+    const [resolvedQueries, setResolvedQueries] = useState({}); // Map of resolved queries to limit featuresCollection update (only update with new data)
+
 
 
 
 
     // Load GeoJSON data of all countries only on startup
     useEffect(() => {
+        if (resolvedQueriesCount < 1) return
 
-        if (fetchedAll) {
-            console.count("Use effect called")
-            console.info(alltimeQueriesResp)
+        let _onLoadUpdate = (updatedFeatures) => {
+            Object.entries(alltimeQueriesResp).forEach(([queryName, queryRes]) => {
+                const [_, __, data] = queryRes;
+                // Only update if query has been resolved for the first time
+                if (data && !(queryName in resolvedQueries)) {
+
+                    try {
+                        updatedFeatures = updateFeaturesCollection(updatedFeatures, data, queryName);
+                        resolvedQueries[queryName] = true
+                        setResolvedQueries(resolvedQueries)
+                    } catch (err) { console.error(err.message)}
+                }
+            });
+
+            setFeaturesCollection(updatedFeatures);
+            if (alltimeQueriesResp[input.variable][2] && !iniColourRender) setIniColourRender(true);
+        }
+
+
+        if (!featuresCollection) {
             getAllGeoJSONs().then(geojsons => {
                 let updatedFeatures = geojsons;
-
-                Object.entries(alltimeQueriesResp).forEach(([queryName, queryRes]) => {
-                    const [loading, error, data] = queryRes;
-                    if (data) updatedFeatures = updateFeaturesCollection(updatedFeatures, data, queryName);
-                });
-
-                setFeaturesCollection(updatedFeatures);
-                setIniColourRender(iniColourRender + 1);
+                _onLoadUpdate(updatedFeatures);
             });
+        } else {
+            _onLoadUpdate(featuresCollection)
         }
-    }, [fetchedAll]);
+    }, [resolvedQueriesCount]);
 
     // Update "reference" value for country colouring on scenario update in featuresCollection
     useEffect(() => {
@@ -119,6 +134,7 @@ export const Main = () => {
             };
 
             const updatedProperties = { ...feature.properties, "value": refValue };
+            if (feature.properties.ADMIN == "Brazil") console.log(updatedProperties);
             return { ...feature, "properties": updatedProperties }
         });
         const updatedFeaturesColl = { ...featuresColl, "features": featuresWithRefVal };
@@ -141,7 +157,7 @@ export const Main = () => {
                             {/**TODO:
                              * load map as soon as data for selected input is ready (average temperature on load)
                              */}
-                            {fetchedAll ?
+                            {iniColourRender ?
                                 <ForecastMap 
                                     featuresCollection={featuresCollection} 
                                     dataLayer={dataLayer}

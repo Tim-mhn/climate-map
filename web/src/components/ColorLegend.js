@@ -26,7 +26,7 @@ export const ColorLegend = ({ colorStops, width, input }) => {
 
     // we use a ref to access the canvas' DOM node
     const canvasRef = useRef(null);
-    console.log("Color legend rendering")
+
     useEffect(() => {
 
         const ctx = canvasRef.current.getContext("2d");
