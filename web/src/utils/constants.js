@@ -57,7 +57,29 @@ export const VARIABLE_TO_UNIT = {
 }
 
 export const INPUT_TO_TOOLTIP = {
-    "variable": "Pick between temperature and precipitation forecast. Anomalies are compared to 1961-199 period",
-    "scenario": "Economic and environment scenarios from the SRES (Special Report on Emissions Scenarios). A2 is characterized by continually increasing population, high emissions. B1 is characterized by population peak in 2050, rapid economic growth but emphasis on environmental solutions.",
-    "granulation": "granulation tooltip",
+    "variable": [
+        "Pick between temperature and precipitation forecasts.",
+        "Anomalies are compared to 1961-199 period"
+    ],
+    "scenario": [
+        "Scenarios are used to make projections of future climate change. \
+        They depend on many parameters such as energy transition, political and environmental actions, \
+        social shift and scientific progress.",
+
+        <span><b>A2 "Business as usual"</b>
+            <ul>
+                <li>Continuously increasing population</li>
+                <li>High emissions</li>
+                <li>Important economic development</li>
+            </ul></span>,
+        <span><b>B1 "A more environmental friendly society"</b>
+            <ul>
+                <li>Population decline after 2050</li>
+                <li>Resource efficient technologies</li>
+                <li>Emphasis on environmental actions</li>
+            </ul></span>,
+
+        "The scenarios are from the SRES (Special Report on Emissions Scenarios).",
+    ],
+    "granulation": ["Year or month average value"],
 }

@@ -36,7 +36,7 @@ const monthMarks = MONTHS.map((month, idx) => { return { "value": idx, "label": 
 
 const scenarioOptions = [
     { "label": "Business as usual (A2 Scenario)", "value": "a2" },
-    { "label": "Ecological Development (B1 Scenario)", "value": "b1" },
+    { "label": "Environmental Emphasis (B1 Scenario)", "value": "b1" },
 ]
 export default function InputBoard({ input, setInput, alltimeQueriesResp }) {
 
@@ -66,7 +66,7 @@ export default function InputBoard({ input, setInput, alltimeQueriesResp }) {
                         <HtmlTooltip title={
                             <React.Fragment>
                                 <Typography color="inherit">Variable</Typography>
-                                <em>{INPUT_TO_TOOLTIP["variable"]}</em>
+                                {INPUT_TO_TOOLTIP["variable"].map(tooltip => <em>{tooltip}</em>)}
                             </React.Fragment>
                         }>
                             <Button><HelpOutlineIcon /></Button>
@@ -92,7 +92,7 @@ export default function InputBoard({ input, setInput, alltimeQueriesResp }) {
                         <HtmlTooltip title={
                             <React.Fragment>
                                 <Typography color="inherit">Scenario</Typography>
-                                <em>{INPUT_TO_TOOLTIP["scenario"]}</em>
+                                {INPUT_TO_TOOLTIP["scenario"].map(tooltip => <p style={{"marginBottom": "4px"}}>{tooltip}</p>)}
                             </React.Fragment>
                         }>
                             <Button><HelpOutlineIcon /></Button>
@@ -120,7 +120,7 @@ export default function InputBoard({ input, setInput, alltimeQueriesResp }) {
                         <HtmlTooltip title={
                             <React.Fragment>
                                 <Typography color="inherit">Granulation</Typography>
-                                <em>{INPUT_TO_TOOLTIP["granulation"]}</em>
+                                {INPUT_TO_TOOLTIP["granulation"].map(tooltip => <em>{tooltip}</em>)}
                             </React.Fragment>
                         }>
                             <Button><HelpOutlineIcon /></Button>
