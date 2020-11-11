@@ -5,11 +5,11 @@ import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import { getAllGeoJSONs } from '../utils/geojson'
 import { useForm } from '../hooks/form';
-import { anomToGross, isInputVariableAnom } from '../utils/string';
+import { anomToGross, isAnomVariable } from '../utils/string';
 import { useFetchAll } from '../hooks/fetch';
 import InputBoard from './InputBoard';
 import ForecastMap from './Map';
-import { ColorLegend } from './ColorLegend';
+import { ColourLegend } from './ColourLegend';
 import { getDataLayerStops, getForecastValueFromProp, updateFeaturesCollection } from '../utils/features'
 
 export const Main = () => {
@@ -113,9 +113,9 @@ export const Main = () => {
     const _getRelativeAnom = (featureProperties, input) => {
         const anomProp = featureProperties[input.variable]; // 'temperatureAnom' property ie
         const grossProp = featureProperties[anomToGross(input.variable)]; // 'temperature' property ie
-        const grossValue = getForecastValueFromProp(grossProp, input);
-        const anomValue = getForecastValueFromProp(anomProp, input);
-        return anomValue / grossValue;
+        let grossValue = Math.abs(getForecastValueFromProp(grossProp, input));
+        let anomValue = getForecastValueFromProp(anomProp, input);
+        return 100 * anomValue / grossValue;
 
 
     }
@@ -128,7 +128,7 @@ export const Main = () => {
 
             let refValue;
             try {
-                refValue = (input.relative && isInputVariableAnom(input)) ? _getRelativeAnom(feature.properties, input) : getForecastValueFromProp(prop, input);
+                refValue = (input.relative && isAnomVariable(input.variable)) ? _getRelativeAnom(feature.properties, input) : getForecastValueFromProp(prop, input);
                 if (refValue) valBuff.push(refValue)
             } catch (e) {
                 console.error(e.message);
@@ -171,7 +171,7 @@ export const Main = () => {
                                 setInput={setInput}
                                 alltimeQueriesResp={alltimeQueriesResp} />
 
-                            <ColorLegend
+                            <ColourLegend
                                 colorStops={dataLayer.paint["fill-color"].stops}
                                 width={280}
                                 input={input}

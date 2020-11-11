@@ -6,7 +6,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import SelectWrapper from './FormControl';
-import { isInputVariableAnom } from '../utils/string';
+import { isAnomVariable, prettyVariable } from '../utils/string';
 import { BASIC_REQ_TIME_PERIODS, MONTHS } from '../utils/constants';
 import { FormControlLabel } from '@material-ui/core';
 import DiscreteSlider from './DiscreteSlider';
@@ -50,7 +50,7 @@ export default function InputBoard({input, setInput, alltimeQueriesResp}) {
                     defaultValue="temperature"
                     handleChange={setInput}
                     items={Object.keys(alltimeQueriesResp).map(queryName => {
-                        return { "value": queryName, "label": camelToSentence(queryName) }
+                        return { "value": queryName, "label": prettyVariable(queryName) }
                     })} />
 
             </Typography>
@@ -71,7 +71,7 @@ export default function InputBoard({input, setInput, alltimeQueriesResp}) {
                     defaultValue="year"
                     handleChange={setInput}
                     items={["year", "month"].map(gran => {
-                        return { "label": gran, "value": gran }
+                        return { "value": gran, "label": camelToSentence(gran) }
                     })} />
 
             </Typography>
@@ -85,7 +85,7 @@ export default function InputBoard({input, setInput, alltimeQueriesResp}) {
                                 onChange={setInput}
                                 name="relative"
                                 color="primary"
-                                disabled={!isInputVariableAnom(input)}
+                                disabled={!isAnomVariable(input.variable)}
                             />
                         }
                         label="Relative anomaly"

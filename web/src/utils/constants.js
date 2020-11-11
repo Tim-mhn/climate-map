@@ -29,7 +29,7 @@ export const DATA_LAYER_SCALES = {
                     "#DE8B00", "#C73C00", "#460B0A"],
         "stops": linearScale(-5, 30, STOPS_COUNT),
         "anomStops": linearScale(-3, 6, STOPS_COUNT),
-        "relativeAnomStops": linearScale(-1, 1, STOPS_COUNT, false)
+        "relativeAnomStops": linearScale(-60, 60, STOPS_COUNT)
     },
     "precipitation": {
         "colours": ["#67001F", "#B2172B", "#D6604D", "#FDDBC7", 

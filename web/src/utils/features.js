@@ -52,6 +52,8 @@ export const getForecastUnit = (variable, granulation) => {
     }
 }
 
+
+
 export const getDataLayerStops = (input) => {
     const isAnom = input.variable.includes("Anom");
     const isRelative = input.relative;
