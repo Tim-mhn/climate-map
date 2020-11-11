@@ -45,24 +45,25 @@ export const Main = () => {
 
     // Load GeoJSON data of all countries only on startup
     useEffect(() => {
-        if (resolvedQueriesCount < 1) return
+        if (resolvedQueriesCount < 1) {return;}
+
 
         let _onLoadUpdate = (updatedFeatures) => {
             Object.entries(alltimeQueriesResp).forEach(([queryName, queryRes]) => {
                 const [_, __, data] = queryRes;
                 // Only update if query has been resolved for the first time
                 if (data && !(queryName in resolvedQueries)) {
-
                     try {
                         updatedFeatures = updateFeaturesCollection(updatedFeatures, data, queryName);
                         resolvedQueries[queryName] = true
                         setResolvedQueries(resolvedQueries)
-                    } catch (err) { console.error(err.message)}
+                    } catch (err) { console.error(err.message) }
                 }
             });
 
             setFeaturesCollection(updatedFeatures);
-            if (alltimeQueriesResp[input.variable][2] && !iniColourRender) setIniColourRender(true);
+            console.log(alltimeQueriesResp);
+            if (alltimeQueriesResp[input.variable][2] && !iniColourRender) { console.log("ini colour render true"); setIniColourRender(true); }
         }
 
 
@@ -74,6 +75,7 @@ export const Main = () => {
         } else {
             _onLoadUpdate(featuresCollection)
         }
+
     }, [resolvedQueriesCount]);
 
     // Update "reference" value for country colouring on scenario update in featuresCollection
@@ -134,7 +136,7 @@ export const Main = () => {
             };
 
             const updatedProperties = { ...feature.properties, "value": refValue };
-            if (feature.properties.ADMIN == "Brazil") console.log(updatedProperties);
+
             return { ...feature, "properties": updatedProperties }
         });
         const updatedFeaturesColl = { ...featuresColl, "features": featuresWithRefVal };
@@ -147,45 +149,48 @@ export const Main = () => {
 
 
         return (
-            <Grid container>
-                <Grid container item direction='row' xs={12} spacing={2}>
+            <Grid container direction='row' alignItems="stretch" style={{'height': '100%'}}>
+                <Grid container item direction='column' justify='center'  xs={12} spacing={2}>
+                    { iniColourRender ? <Grid container item direction='row' xs={12}>
+                        <Grid container item direction='column' justify='center' xs={9} spacing={2}>
 
-                    <Grid container item direction='column' xs={9} spacing={2}>
-                        {/* Map */}
-
-                        <Grid item xs={8}>
-                            {/**TODO:
-                             * load map as soon as data for selected input is ready (average temperature on load)
-                             */}
-                            {iniColourRender ?
-                                <ForecastMap 
-                                    featuresCollection={featuresCollection} 
+                            <Grid item xs={8}>
+                                <ForecastMap
+                                    featuresCollection={featuresCollection}
                                     dataLayer={dataLayer}
                                     input={input}
-                                    />
-                                :
-                                <CircularProgress
-                                    size={100}
                                 />
-                            }
+                            </Grid>
+
                         </Grid>
-                    </Grid>
 
-
-                    <Grid container item direction='column' xs={3} spacing={1} justify='flex-start' style={{ 'zIndex': 999, 'paddingTop': '48px', 'paddingRight': '24px' }}>
-                        {/* Inputs */}
-                            <InputBoard 
-                            input={input} 
-                            setInput={setInput} 
-                            alltimeQueriesResp={alltimeQueriesResp}/>
-
-                            <ColorLegend 
-                                colorStops={dataLayer.paint["fill-color"].stops} 
-                                width={280} 
+                        <Grid container item direction='column' xs={3} spacing={1} justify='flex-start' style={{ 'zIndex': 999, 'paddingTop': '48px', 'paddingRight': '24px' }}>
+                            {/* Inputs */}
+                            <InputBoard
                                 input={input}
-                                />
+                                setInput={setInput}
+                                alltimeQueriesResp={alltimeQueriesResp} />
 
-                    </Grid>
+                            <ColorLegend
+                                colorStops={dataLayer.paint["fill-color"].stops}
+                                width={280}
+                                input={input}
+                            />
+
+                        </Grid>
+                    </Grid> :                     
+                    
+                    <Grid id='progress-wrapper' container item direction='row' justify='center' alignItems='center' >
+                        <CircularProgress
+                            size={100}
+                        />
+                    </Grid> 
+                    
+                    }
+
+                                               :
+
+
 
                 </Grid>
 

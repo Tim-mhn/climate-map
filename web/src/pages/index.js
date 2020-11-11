@@ -7,7 +7,7 @@ const Index = () => (
         style={{
           position: 'fixed',
           width: '100vw',
-          height: 'inherit',
+          height: '100vh',
           display: 'flex',
           flexDirection: 'column', 
           alignItems: 'stretch',

@@ -69,7 +69,7 @@ export class AverageForecastResolver {
         @Arg("percentile", { defaultValue: '50'}) percentile: '10' | '50' |'90' = '50',
         @Arg("test", { defaultValue: false}) test: boolean
     ) {
-        console.debug(`Calling alltime_forecasts with args: ${iso3} ${variable} ${percentile} ${type}`)
+        console.info(`Calling alltime_forecasts with args: ${iso3} ${variable} ${percentile} ${type}`)
         let baseUrl = "http://climatedataapi.worldbank.org/climateweb/rest/v1/country/"
         const apiType = "m"+type; // manom or mavg
         let url = `${baseUrl}${apiType}/ensemble/${percentile}/${variable}/`;
