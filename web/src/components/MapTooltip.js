@@ -1,5 +1,5 @@
 import { getForecastUnit } from "../utils/features";
-import { camelToSentence } from "../utils/string";
+import { camelToSentence, formatValue, prettyVariable } from "../utils/string";
 
 
 export default function MapTooltip({hoverFeature, hoverX, hoverY, input}) {
@@ -8,10 +8,9 @@ export default function MapTooltip({hoverFeature, hoverX, hoverY, input}) {
 
     let content;
     if(hoverFeature.properties.value && hoverFeature.properties.value != "null") {
-        const variable = camelToSentence(input.variable);
         const val = hoverFeature.properties.value.toFixed(1);
-        const unit = getForecastUnit(input.variable, input.granulation);
-        content = `${variable}: ${val} ${unit}`
+        // const unit = input.relative ?  : getForecastUnit(input.variable, input.granulation);
+        content = `${prettyVariable(input.variable)} ${formatValue(input, val)}`;
     } else { content = "No data for this country" }
         
     return <div className="tooltip" style={{position: 'absolute', left: hoverX+15, top: hoverY+15}}>
