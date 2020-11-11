@@ -55,3 +55,9 @@ export const VARIABLE_TO_UNIT = {
     "temperature": "°C",
     "precipitation": "mm/month"
 }
+
+export const INPUT_TO_TOOLTIP = {
+    "variable": "Pick between temperature and precipitation forecast. Anomalies are compared to 1961-199 period",
+    "scenario": "Economic and environment scenarios from the SRES (Special Report on Emissions Scenarios). A2 is characterized by continually increasing population, high emissions. B1 is characterized by population peak in 2050, rapid economic growth but emphasis on environmental solutions.",
+    "granulation": "granulation tooltip",
+}
