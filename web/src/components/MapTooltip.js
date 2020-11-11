@@ -9,7 +9,7 @@ export default function MapTooltip({hoverFeature, hoverX, hoverY, input}) {
     let content;
     if(hoverFeature.properties.value && hoverFeature.properties.value != "null") {
         const variable = camelToSentence(input.variable);
-        const val = hoverFeature.properties.value.toFixed(2);
+        const val = hoverFeature.properties.value.toFixed(1);
         const unit = getForecastUnit(input.variable, input.granulation);
         content = `${variable}: ${val} ${unit}`
     } else { content = "No data for this country" }
