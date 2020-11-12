@@ -40,7 +40,7 @@ export const ColourLegend = ({ colorStops, width, input }) => {
 
         // Add three color stops
         const colors = colorStops.map(stop => stop[1]);
-        const stopValues = colorStops.map(stop => stop[0]);
+        const stopValues = colorStops.map(stop => stop[0]).map(stopVal => stopVal.toFixed(1));
         const normalizedStopVals = normalizeArray(stopValues);
 
         for (const [value, color] of zip(normalizedStopVals, colors)) {

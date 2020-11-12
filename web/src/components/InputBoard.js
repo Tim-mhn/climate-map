@@ -62,14 +62,15 @@ export default function InputBoard({ input, setInput, alltimeQueriesResp }) {
                         </Typography>
                     </Grid>
                     {/* Input tooltips */}
-                    <Grid container item direction='column' xs={1}>
+                    <Grid container item direction='column' justify="center" alignItems="center" xs={1}>
                         <HtmlTooltip title={
                             <React.Fragment>
                                 <Typography color="inherit">Variable</Typography>
-                                {INPUT_TO_TOOLTIP["variable"].map(tooltip => <em>{tooltip}</em>)}
+                                {INPUT_TO_TOOLTIP["variable"].map(tooltip => <p>{tooltip}</p>)}
                             </React.Fragment>
                         }>
-                            <Button><HelpOutlineIcon /></Button>
+                            {/* <Button style={{"minWidth": "0px", "padding": '0'}}><HelpOutlineIcon /></Button> */}
+                            <HelpOutlineIcon />
                         </HtmlTooltip>
                     </Grid>
                 </Grid>
@@ -88,14 +89,14 @@ export default function InputBoard({ input, setInput, alltimeQueriesResp }) {
                         </Typography>
                     </Grid>
                     {/* Input tooltips */}
-                    <Grid container item direction='column' xs={1}>
+                    <Grid container item direction='column' justify="center" alignItems="center" xs={1}>
                         <HtmlTooltip title={
                             <React.Fragment>
                                 <Typography color="inherit">Scenario</Typography>
                                 {INPUT_TO_TOOLTIP["scenario"].map(tooltip => <p style={{"marginBottom": "4px"}}>{tooltip}</p>)}
                             </React.Fragment>
                         }>
-                            <Button><HelpOutlineIcon /></Button>
+                            <HelpOutlineIcon />
                         </HtmlTooltip>
                     </Grid>
                 </Grid>
@@ -116,14 +117,14 @@ export default function InputBoard({ input, setInput, alltimeQueriesResp }) {
                         </Typography>
                     </Grid>
                     {/* Input tooltips */}
-                    <Grid container item direction='column' xs={1}>
+                    <Grid container item direction='column' justify="center" alignItems="center" xs={1}>
                         <HtmlTooltip title={
                             <React.Fragment>
                                 <Typography color="inherit">Granulation</Typography>
-                                {INPUT_TO_TOOLTIP["granulation"].map(tooltip => <em>{tooltip}</em>)}
+                                {INPUT_TO_TOOLTIP["granulation"].map(tooltip => <p>{tooltip}</p>)}
                             </React.Fragment>
                         }>
-                            <Button><HelpOutlineIcon /></Button>
+                            <HelpOutlineIcon />
                         </HtmlTooltip>
                     </Grid>
                 </Grid>
@@ -182,8 +183,6 @@ export default function InputBoard({ input, setInput, alltimeQueriesResp }) {
 
 
         </CardContent>
-        {/* <CardActions>
-        <Button size="small">Learn More</Button>
-    </CardActions> */}
+
     </Card>
 }

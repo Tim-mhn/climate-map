@@ -1,5 +1,4 @@
-import { getForecastUnit } from "../utils/features";
-import { camelToSentence, formatValue, prettyVariable } from "../utils/string";
+import {  formatValue, prettyVariable } from "../utils/string";
 
 
 export default function MapTooltip({hoverFeature, hoverX, hoverY, input}) {
