@@ -31,19 +31,17 @@ export default function ForecastMap({featuresCollection, dataLayer, input}) {
         } = event;
         const hoverFeature = features && features.find(f => ['data', 'no-data'].includes(f.layer.id));
         setHoverState({ hoverFeature, hoverX: offsetX, hoverY: offsetY})
-        console.log(hoverFeature)
       };
 
       // Update filter used to find current hovered area (and highlight it)
       const _hoverHighlightFilter = useMemo(() => (['==', 'ISO_A3', hoverState.hoverFeature ? hoverState.hoverFeature.properties.ISO_A3 : '']), [hoverState]);
 
-
+      // Split between countries with and without data
       const _featuresWithData = featuresCollection.features.filter(feature => feature.properties.value);
       const _featuresWithoutData = featuresCollection.features.filter(feature => !feature.properties.value);
 
       const _featuresCollWithData = { ...featuresCollection, features: _featuresWithData};
       const _featuresCollWithoutData = { ...featuresCollection, features: _featuresWithoutData};
-      console.log(theme);
 
       return <ReactMapGL
         width='100vw'
