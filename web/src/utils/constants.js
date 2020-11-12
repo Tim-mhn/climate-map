@@ -55,3 +55,31 @@ export const VARIABLE_TO_UNIT = {
     "temperature": "°C",
     "precipitation": "mm/month"
 }
+
+export const INPUT_TO_TOOLTIP = {
+    "variable": [
+        "Pick between temperature and precipitation forecasts.",
+        "Anomalies are compared to 1961-199 period"
+    ],
+    "scenario": [
+        "Scenarios are used to make projections of future climate change. \
+        They depend on many parameters such as energy transition, political and environmental actions, \
+        social shift and scientific progress.",
+
+        <span><b>A2 "Business as usual"</b>
+            <ul>
+                <li>Continuously increasing population</li>
+                <li>High emissions</li>
+                <li>Important economic development</li>
+            </ul></span>,
+        <span><b>B1 "A more environmental friendly society"</b>
+            <ul>
+                <li>Population decline after 2050</li>
+                <li>Resource efficient technologies</li>
+                <li>Emphasis on environmental actions</li>
+            </ul></span>,
+
+        "The scenarios are from the SRES (Special Report on Emissions Scenarios).",
+    ],
+    "granulation": ["Year or month average value"],
+}
