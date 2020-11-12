@@ -8,13 +8,13 @@ A world map to alert people on climate change consequences. Forecasts per countr
 [Trello](https://trello.com/b/Cb7wVbBb/kanban-template)
 
 #### Server:
-Express, Typescript, GraphQL, Apollo Server
+[Express](https://expressjs.com/), Typescript, [GraphQL](https://graphql.org/graphql-js/), [Apollo Server](https://www.apollographql.com/docs/apollo-server/)
 
 #### Client: 
-React, Next.js, MaterialUI, MapboxGL, Canvas API
+React, [Next.js](https://nextjs.org/), [MaterialUI](https://material-ui.com/), [MapboxGL](https://visgl.github.io/react-map-gl/docs/get-started/mapbox-tokens), [Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API)
 
 #### Devops:
-Docker, Dokku, DigitalOcean, Vercel
+Docker, Dokku, [DigitalOcean](https://www.digitalocean.com/), [Vercel](https://vercel.com/)
 
 
 # [It's live !](https://ourclimate.live) but still wip ...
