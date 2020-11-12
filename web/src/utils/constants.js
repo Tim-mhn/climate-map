@@ -21,21 +21,52 @@ export const DERIVED_REQ_TIME_PERIODS = {
 
 
 const STOPS_COUNT = 10;
+export const hex2rgba = (hex, a=.7) => {
+    // "use strict";
+    if (hex.charAt(0) === '#') {
+        hex = hex.substr(1);
+    }
+    if ((hex.length < 2) || (hex.length > 6)) {
+        return false;
+    }
+    var values = hex.split(''),
+        r,
+        g,
+        b;
+
+    if (hex.length === 2) {
+        r = parseInt(values[0].toString() + values[1].toString(), 16);
+        g = r;
+        b = r;
+    } else if (hex.length === 3) {
+        r = parseInt(values[0].toString() + values[0].toString(), 16);
+        g = parseInt(values[1].toString() + values[1].toString(), 16);
+        b = parseInt(values[2].toString() + values[2].toString(), 16);
+    } else if (hex.length === 6) {
+        r = parseInt(values[0].toString() + values[1].toString(), 16);
+        g = parseInt(values[2].toString() + values[3].toString(), 16);
+        b = parseInt(values[4].toString() + values[5].toString(), 16);
+    } else {
+        return false;
+    }
+    return `rgba(${r},${g},${b},${a})`;
+}
+
 
 export const DATA_LAYER_SCALES = {
     "temperature": {
-        "colours": ["#8D8D8D", "#BA77D7", "#A20FE2", 
-                    "#0004CE", "#00CAD8", "#12BD2B", "#E3DB00", 
-                    "#DE8B00", "#C73C00", "#460B0A"],
+        "colours": ["rgba(141,141, 141, 0.7)", "rgba(186,119, 215, 0.7)", "rgba(162,15, 226, 0.7)", "rgba(0,4, 206, 0.7)", 
+                    "rgba(0,202, 216, 0.7)", "rgba(18,189, 43, 0.7)", "rgba(227,219, 0, 0.7)", "rgba(222,139, 0, 0.7)", 
+                    "rgba(199,60, 0, 0.7)", "rgba(70,11, 10, 0.7)"],
         "stops": linearScale(-5, 30, STOPS_COUNT),
         "anomStops": linearScale(-3, 6, STOPS_COUNT),
-        "relativeAnomStops": linearScale(-60, 60, STOPS_COUNT)
+        "relativeAnomStops": linearScale(-60, 61, STOPS_COUNT)
     },
     "precipitation": {
-        "colours": ["#67001F", "#B2172B", "#D6604D", "#FDDBC7", 
-                    "#F8F8F8", "#D1E5F0", "#92C5DF", "#4393C3", 
-                    "#2166AC", "#053061"],
-        "stops": linearScale(0, 350, STOPS_COUNT),
+        "colours": ["rgba(103,0, 31, 0.7)", "rgba(178,23, 43, 0.7)", "rgba(214,96, 77, 0.7)", "rgba(253,219, 199, 0.7)", 
+                    "rgba(248,248, 248, 0.7)", "rgba(209,229, 240, 0.7)", "rgba(146,197, 223, 0.7)", 
+                    "rgba(67,147, 195, 0.7)", "rgba(33,102, 172, 0.7)", "rgba(5,48, 97, 0.7)"] ,
+        "stops": linearScale(10, 300, STOPS_COUNT),
         "anomStops": linearScale(-20, 30, STOPS_COUNT),
         "relativeAnomStops":linearScale(-.3, .3, STOPS_COUNT, false)
     },
@@ -43,9 +74,13 @@ export const DATA_LAYER_SCALES = {
         "colours": ["#00FF7F", "#27dc54", "#3BCA6D", "#77945C", 
                     "#818a77", "#B25F4A", "#ED2938", "#ed1524", 
                     "#f70110", "#ff0000"],
-        "stops": [],
-        "anomStops": [],
-        "relativeAnomStops": []
+        "stops": linearScale(0, 100, STOPS_COUNT),
+        "anomStops": ["#00FF7F", "#27dc54", "#3BCA6D", "#77945C", 
+                    "#818a77", "#B25F4A", "#ED2938", "#ed1524", 
+                    "#f70110", "#ff0000"],
+        "relativeAnomStops": ["#00FF7F", "#27dc54", "#3BCA6D", "#77945C", 
+                            "#818a77", "#B25F4A", "#ED2938", "#ed1524", 
+                            "#f70110", "#ff0000"]
     }
 }
 
@@ -59,7 +94,7 @@ export const VARIABLE_TO_UNIT = {
 export const INPUT_TO_TOOLTIP = {
     "variable": [
         "Pick between temperature and precipitation forecasts.",
-        "Anomalies are compared to 1961-199 period"
+        "Anomalies are changes compared to the 1961-199 period"
     ],
     "scenario": [
         "Scenarios are used to make projections of future climate change. \

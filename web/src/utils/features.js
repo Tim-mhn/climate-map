@@ -58,12 +58,17 @@ export const getDataLayerStops = (input) => {
     const isAnom = input.variable.includes("Anom");
     const isRelative = input.relative;
     const grossVariable = anomToGross(input.variable);
-    const colours = DATA_LAYER_SCALES[grossVariable]["colours"];
+    let colours = DATA_LAYER_SCALES[grossVariable]["colours"];
 
     const stopsKey = !isAnom ? "stops" : (isRelative ? "relativeAnomStops" : "anomStops");
-    const stops = DATA_LAYER_SCALES[grossVariable][stopsKey];
+    let stops = DATA_LAYER_SCALES[grossVariable][stopsKey];
 
-    if (stops.length != colours.length) console.error("Stops and colours don't have same length !")
+    if (stops.length != colours.length) {
+        console.warn(`Stops and colours don't have same length ! \Stops (${stops.length}): ${stops} \Colours (${colours.length}): ${colours}`);
+        const minLength = Math.min(stops.length, colours.length);
+        stops = stops.slice(0, minLength);
+        colours = colours.slice(0, minLength);
+    }
 
     return zip(stops, colours);
 }

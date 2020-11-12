@@ -23,3 +23,4 @@ export const formatValue = (input, value) => {
         return `${value} ${unit}`;
     }
 }
+
