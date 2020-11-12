@@ -8,7 +8,6 @@ export default function MapTooltip({hoverFeature, hoverX, hoverY, input}) {
     let content;
     if(hoverFeature.properties.value && hoverFeature.properties.value != "null") {
         const val = hoverFeature.properties.value.toFixed(1);
-        // const unit = input.relative ?  : getForecastUnit(input.variable, input.granulation);
         content = `${prettyVariable(input.variable)} ${formatValue(input, val)}`;
     } else { content = "No data for this country" }
         

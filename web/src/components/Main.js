@@ -62,7 +62,7 @@ export const Main = () => {
             });
 
             setFeaturesCollection(updatedFeatures);
-            console.log(alltimeQueriesResp);
+
             if (alltimeQueriesResp[input.variable][2] && !iniColourRender) { console.log("ini colour render true"); setIniColourRender(true); }
         }
 
