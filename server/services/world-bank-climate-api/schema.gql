@@ -19,6 +19,12 @@ type CountryBaseForecast {
   error: String
 }
 
+type CountryHistory {
+  country: String!
+  data: [YearValue!]
+  error: String
+}
+
 type CountryPrecipitationForecast {
   country: String!
   data: [PrecipitationForecast!]
@@ -38,7 +44,13 @@ type PrecipitationForecast {
 type Query {
   alltime_forecasts(iso3: [String!] = null, percentile: String = "50", test: Boolean = false, type: String = "avg", variable: String!): [CountryBaseForecast!]!
   daily_ppt_forecasts(granulation: String = "year", iso3: String = null): CountryPrecipitationForecast!
-  forecasts(end: String!, iso3: [String!] = null, percentile: String = "50", start: String!, test: Boolean = false, type: String = "annualavg", variable: String!): [CountryBaseForecast!]!
+  forecasts(end: String!, iso3: [String!]!, percentile: String = "50", start: String!, test: Boolean = false, type: String = "annualavg", variable: String!): [CountryBaseForecast!]!
   hello: String!
+  history(iso3: String!, variable: String!): CountryHistory!
   hot_days(end: String!, iso3: String = null, percentile: String = "50", start: String!, test: Boolean = false, type: String = "mavg"): CountryBaseForecast!
+}
+
+type YearValue {
+  value: Float!
+  year: Float!
 }

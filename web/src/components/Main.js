@@ -3,6 +3,8 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import { Drawer, IconButton } from '@material-ui/core';
 import { getAllGeoJSONs } from '../utils/geojson'
 import { useForm } from '../hooks/form';
 import { anomToGross, isAnomVariable } from '../utils/string';
@@ -11,6 +13,7 @@ import InputBoard from './InputBoard';
 import ForecastMap from './Map';
 import { ColourLegend } from './ColourLegend';
 import { getDataLayerStops, getForecastValueFromProp, updateFeaturesCollection } from '../utils/features'
+import { DataDrawer } from './DataDrawer';
 
 export const Main = () => {
 
@@ -28,7 +31,7 @@ export const Main = () => {
         },
     }));
 
-    const classes2 = useStyles();
+    const classes = useStyles();
 
 
     const [featuresCollection, setFeaturesCollection] = useState(null);
@@ -45,7 +48,7 @@ export const Main = () => {
 
     // Load GeoJSON data of all countries only on startup
     useEffect(() => {
-        if (resolvedQueriesCount < 1) {return;}
+        if (resolvedQueriesCount < 1) { return; }
 
 
         let _onLoadUpdate = (updatedFeatures) => {
@@ -149,9 +152,9 @@ export const Main = () => {
 
 
         return (
-            <Grid container direction='row' alignItems="stretch" style={{'height': '100%'}}>
-                <Grid container item direction='column' justify='center'  xs={12} spacing={2}>
-                    { iniColourRender ? <Grid container item direction='row' xs={12}>
+            <Grid container direction='row' alignItems="stretch" style={{ 'height': '100%' }}>
+                <Grid container item direction='column' justify='center' xs={12} spacing={2}>
+                    {iniColourRender ? <Grid container item direction='row' xs={12}>
                         <Grid container item direction='column' justify='center' xs={9} spacing={2}>
 
                             <Grid item xs={8}>
@@ -160,6 +163,7 @@ export const Main = () => {
                                     dataLayer={dataLayer}
                                     input={input}
                                 />
+
                             </Grid>
 
                         </Grid>
@@ -178,14 +182,14 @@ export const Main = () => {
                             />
 
                         </Grid>
-                    </Grid> :                     
-                    
-                    <Grid id='progress-wrapper' container item direction='row' justify='center' alignItems='center' >
-                        <CircularProgress
-                            size={100}
-                        />
-                    </Grid> 
-                    
+                    </Grid> :
+
+                        <Grid id='progress-wrapper' container item direction='row' justify='center' alignItems='center' >
+                            <CircularProgress
+                                size={100}
+                            />
+                        </Grid>
+
                     }
 
                                                :

@@ -5,11 +5,12 @@ import "dotenv-safe/config"
 import { buildSchema } from 'type-graphql';
 import { AverageForecastResolver } from './resolvers/averageForecastResolver';
 import { DerivedStatResolver } from './resolvers/derivedStatResolver';
+import { HistoryResolver } from './resolvers/historyResolver';
 
 
 async function startServer() {
   const schema = await buildSchema({
-    resolvers: [AverageForecastResolver, DerivedStatResolver],
+    resolvers: [AverageForecastResolver, DerivedStatResolver, HistoryResolver],
     emitSchemaFile: true
   });
 
