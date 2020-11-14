@@ -3,8 +3,6 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import { Drawer, IconButton } from '@material-ui/core';
 import { getAllGeoJSONs } from '../utils/geojson'
 import { useForm } from '../hooks/form';
 import { anomToGross, isAnomVariable } from '../utils/string';
@@ -13,7 +11,6 @@ import InputBoard from './InputBoard';
 import ForecastMap from './Map';
 import { ColourLegend } from './ColourLegend';
 import { getDataLayerStops, getForecastValueFromProp, updateFeaturesCollection } from '../utils/features'
-import { DataDrawer } from './DataDrawer';
 
 export const Main = () => {
 

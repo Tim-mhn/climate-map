@@ -37,7 +37,9 @@ export default function ForecastMap({ featuresCollection, dataLayer, input }) {
   };
 
   const _onClick = event => {
+    console.info(event)
     const { features } = event;
+    console.info(features)
     const _clickedFeature = features && features.find(f => f.layer.id == 'data');
     setClickedFeature(_clickedFeature)
   }
