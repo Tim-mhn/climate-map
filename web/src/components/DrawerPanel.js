@@ -1,4 +1,4 @@
-import { CircularProgress } from "@material-ui/core";
+import { CircularProgress, Grid, Typography } from "@material-ui/core";
 import { useEffect } from "react";
 import { PrecipitationHistoryQuery, TemperatureHistoryQuery } from "../graphql/queries/HistoryQueries";
 import { anomToGross, prettyVariable } from "../utils/string";
@@ -52,18 +52,18 @@ export const DrawerPanel = ({ featuresCollection, clickedFeature, input }) => {
 
         const myChart = new Chart(ctx, {
             type: "line",
-            height: "200px",
-            width: "800px",
+            height: "400px",
+            // width: "800px",
             data: {
                 datasets: _datasets
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                title: {
-                    display: true,
-                    text: prettyVariable(anomToGross(input.variable))
-                },
+                // title: {
+                //     display: true,
+                //     text: prettyVariable(anomToGross(input.variable))
+                // },
                 scales: {
                     xAxes: [{
                         type: 'time',
@@ -71,37 +71,51 @@ export const DrawerPanel = ({ featuresCollection, clickedFeature, input }) => {
                             unit: 'year'
                         }
                     }],
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }]
+                    // yAxes: [{
+                    //     ticks: {
+                    //         beginAtZero: true
+                    //     }
+                    // }]
                 }
             }
         });
-        // myChart.destroy();
-        // myChart.height = '200px'
         myChart.update();
         console.log(myChart.height)
 
-        // setTimeout( () => myChart.destroy(), 5000);
     }, [data]);
 
     console.log(loading);
 
 
-    return <div height="400px" style={{maxWidth: '800px !important'}}>
-        {clickedFeature &&
-            <p>  {clickedFeature.properties.ADMIN}</p>
-        }
-        <div height="200px" width="800px" style={{ 'visibility': loading ? 'hidden': ''}}>
-            <canvas id="myChart" height="200px" width="800px !important" />
+    return <Grid container direction='column' justify='flex-start' alignItems='flex-start' height="600px" style={{ 'padding': '24px' }}>
 
-        </div>
+        <Grid container item direction='row' justify='flex-start'>
+            <Typography>{clickedFeature ? clickedFeature.properties.ADMIN : ''} </Typography>
+        </Grid>
 
-        {loading && <CircularProgress size={50} />}
+        {/* row of 1 (or maybe more charts) */}
+        <Grid container item direction='row' justify='flex-start' alignItems='flex-start' >
+            <Grid container item direction='column' justify="flex-start" alignItems="center">
+                <Grid contaier item direction='row' justify="flex-start" alignItems="start">
+                    <p>{prettyVariable(anomToGross(input.variable))} </p>
+                </Grid>
+
+                <Grid contaier item direction='row' justify="flex-start" alignItems="start" style={{ 'visibility': loading ? 'hidden' : '', 'width': loading ? '0px' : '1400px' }}>
+                    <canvas id="myChart" height="400px" />
+
+                </Grid>
+
+                <Grid container item direction='row' justify="flex-start" alignItems="start">
+                    {loading && <CircularProgress size={50} />}
+                </Grid>
 
 
-    </div>
+            </Grid>
+
+
+
+        </Grid>
+
+    </Grid >
 
 }
