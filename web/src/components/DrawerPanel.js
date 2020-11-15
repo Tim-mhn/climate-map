@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import { PrecipitationHistoryQuery, TemperatureHistoryQuery } from "../graphql/queries/HistoryQueries";
 import { anomToGross, prettyVariable } from "../utils/string";
 import { useGraphQL } from "../hooks/graphql";
+import { VARIABLE_TO_UNIT } from "../utils/constants";
+import { getForecastUnit } from "../utils/features";
 
 export const DrawerPanel = ({ featuresCollection, clickedFeature, input }) => {
     const historyQuery = input.variable.includes("temperature") ? TemperatureHistoryQuery : PrecipitationHistoryQuery
@@ -52,18 +54,13 @@ export const DrawerPanel = ({ featuresCollection, clickedFeature, input }) => {
 
         const myChart = new Chart(ctx, {
             type: "line",
-            height: "400px",
-            // width: "800px",
+            height: "200px",
             data: {
                 datasets: _datasets
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                // title: {
-                //     display: true,
-                //     text: prettyVariable(anomToGross(input.variable))
-                // },
                 scales: {
                     xAxes: [{
                         type: 'time',
@@ -79,15 +76,15 @@ export const DrawerPanel = ({ featuresCollection, clickedFeature, input }) => {
                 }
             }
         });
-        myChart.update();
-        console.log(myChart.height)
+        // TODO: Not sure if this line is needed to refresh chart properly 
+        // myChart.update(); 
 
     }, [data]);
 
     console.log(loading);
 
 
-    return <Grid container direction='column' justify='flex-start' alignItems='flex-start' height="600px" style={{ 'padding': '24px' }}>
+    return <Grid container direction='column' justify='flex-start' alignItems='flex-start' height="280px" style={{ 'padding': '24px' }}>
 
         <Grid container item direction='row' justify='flex-start'>
             <Typography>{clickedFeature ? clickedFeature.properties.ADMIN : ''} </Typography>
@@ -95,19 +92,26 @@ export const DrawerPanel = ({ featuresCollection, clickedFeature, input }) => {
 
         {/* row of 1 (or maybe more charts) */}
         <Grid container item direction='row' justify='flex-start' alignItems='flex-start' >
-            <Grid container item direction='column' justify="flex-start" alignItems="center">
-                <Grid contaier item direction='row' justify="flex-start" alignItems="start">
-                    <p>{prettyVariable(anomToGross(input.variable))} </p>
-                </Grid>
-
-                <Grid contaier item direction='row' justify="flex-start" alignItems="start" style={{ 'visibility': loading ? 'hidden' : '', 'width': loading ? '0px' : '1400px' }}>
-                    <canvas id="myChart" height="400px" />
-
-                </Grid>
-
+            <Grid container item direction='column' justify="flex-start" alignItems="start">
                 <Grid container item direction='row' justify="flex-start" alignItems="start">
-                    {loading && <CircularProgress size={50} />}
+                    <p>{prettyVariable(anomToGross(input.variable))} ({getForecastUnit(anomToGross(input.variable))})</p>
                 </Grid>
+                <Grid container item direction='row' justify="flex-start" alignItems="start">
+                    {/* Country historical + forecast chart */}
+                    <Grid container item direction='row' justify="flex-start" alignItems="start" style={{ 'visibility': loading ? 'hidden' : '', 'width': (loading) ? '0px' : '1400px' }}>
+                        <canvas id="myChart" height="200px" />
+
+                    </Grid>
+
+                    {/* Loading Spinner  */}
+                    <Grid container item direction='row' justify="center" alignItems="center">
+                        {loading && <CircularProgress size={80} />}
+                    </Grid>
+
+
+
+                </Grid>
+
 
 
             </Grid>

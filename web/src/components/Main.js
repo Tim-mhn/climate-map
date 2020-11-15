@@ -165,7 +165,7 @@ export const Main = () => {
 
                         </Grid>
 
-                        <Grid container item direction='column' xs={3} spacing={1} justify='flex-start' style={{ 'zIndex': 999, 'paddingTop': '48px', 'paddingRight': '24px' }}>
+                        <Grid container item direction='column' xs={3} spacing={1} justify='flex-start' style={{ 'zIndex': 999, 'paddingTop': '8px', 'paddingRight': '16px' }}>
                             {/* Inputs */}
                             <InputBoard
                                 input={input}
