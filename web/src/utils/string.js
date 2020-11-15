@@ -15,12 +15,9 @@ export const anomToGross = (anomVariableName) => anomVariableName.replace('Anom'
 export const isAnomVariable = (variable) => variable.includes('Anom');
 
 export const formatValue = (input, value) => {
-    if (input.relative && isAnomVariable(input.variable)) {
-        const sign = value >= 0 ? '+' : '';
-        return `${sign}${value}%`
-    } else {
-        const unit = getForecastUnit(input.variable, input.granulation);
-        return `${value} ${unit}`;
-    }
+    const isAnomaly = isAnomVariable(input.variable);
+    const unit = (input.relative && isAnomaly) ? '%' : getForecastUnit(input.variable, input.granulation);
+    const sign = value >= 0 ? '+' : '';
+    return `${isAnomaly ? sign : ''} ${value} ${unit}`;
 }
 

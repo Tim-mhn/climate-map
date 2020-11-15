@@ -28,7 +28,7 @@ export const Main = () => {
         },
     }));
 
-    const classes2 = useStyles();
+    const classes = useStyles();
 
 
     const [featuresCollection, setFeaturesCollection] = useState(null);
@@ -45,7 +45,7 @@ export const Main = () => {
 
     // Load GeoJSON data of all countries only on startup
     useEffect(() => {
-        if (resolvedQueriesCount < 1) {return;}
+        if (resolvedQueriesCount < 1) { return; }
 
 
         let _onLoadUpdate = (updatedFeatures) => {
@@ -149,9 +149,9 @@ export const Main = () => {
 
 
         return (
-            <Grid container direction='row' alignItems="stretch" style={{'height': '100%'}}>
-                <Grid container item direction='column' justify='center'  xs={12} spacing={2}>
-                    { iniColourRender ? <Grid container item direction='row' xs={12}>
+            <Grid container direction='row' alignItems="stretch" style={{ 'height': '100%' }}>
+                <Grid container item direction='column' justify='center' xs={12} spacing={2}>
+                    {iniColourRender ? <Grid container item direction='row' xs={12}>
                         <Grid container item direction='column' justify='center' xs={9} spacing={2}>
 
                             <Grid item xs={8}>
@@ -160,11 +160,12 @@ export const Main = () => {
                                     dataLayer={dataLayer}
                                     input={input}
                                 />
+
                             </Grid>
 
                         </Grid>
 
-                        <Grid container item direction='column' xs={3} spacing={1} justify='flex-start' style={{ 'zIndex': 999, 'paddingTop': '48px', 'paddingRight': '24px' }}>
+                        <Grid container item direction='column' xs={3} spacing={1} justify='flex-start' style={{ 'zIndex': 999, 'paddingTop': '8px', 'paddingRight': '16px' }}>
                             {/* Inputs */}
                             <InputBoard
                                 input={input}
@@ -178,14 +179,14 @@ export const Main = () => {
                             />
 
                         </Grid>
-                    </Grid> :                     
-                    
-                    <Grid id='progress-wrapper' container item direction='row' justify='center' alignItems='center' >
-                        <CircularProgress
-                            size={100}
-                        />
-                    </Grid> 
-                    
+                    </Grid> :
+
+                        <Grid id='progress-wrapper' container item direction='row' justify='center' alignItems='center' >
+                            <CircularProgress
+                                size={100}
+                            />
+                        </Grid>
+
                     }
 
                                                :

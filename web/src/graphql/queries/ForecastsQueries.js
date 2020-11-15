@@ -1,4 +1,4 @@
-import { gql, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
 
 
 export const TemperatureQuery = gql`
@@ -31,7 +31,7 @@ query Precipitations($start: String!, $end: String!) {
 
 export const AlltimeTemperatureQuery = gql`
 query AlltimeTemperatures($type: String) {
-    alltime_forecasts(test: true, percentile: "50", type: $type, variable: "tas") { 
+    alltime_forecasts(test: false, percentile: "50", type: $type, variable: "tas") { 
   		country, 
     	data {
             scenario
@@ -47,7 +47,7 @@ query AlltimeTemperatures($type: String) {
 
 export const AlltimePrecipitationQuery = gql`
 query AlltimePrecipitations($type: String) {
-    alltime_forecasts(test: true, percentile: "50", type: $type, variable: "pr") { 
+    alltime_forecasts(test: false, percentile: "50", type: $type, variable: "pr") { 
   		country, 
     	data {
             scenario

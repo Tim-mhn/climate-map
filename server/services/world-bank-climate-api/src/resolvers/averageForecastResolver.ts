@@ -20,7 +20,7 @@ export class AverageForecastResolver {
     
     @Query(() => [CountryBaseForecast])
     async forecasts(
-        @Arg("iso3", () => [String], { defaultValue: null, nullable: true}) iso3: string[],
+        @Arg("iso3", () => [String]) iso3: string[],
         @Arg("variable", () => String) variable: 'tas' | 'pr',
         @Arg("type", () => String, { defaultValue: 'annualavg'}) type: 'annualavg' | 'annualanom' ,
         @Arg("start") start: string,
@@ -78,7 +78,7 @@ export class AverageForecastResolver {
         let countryCodes: string[] = iso3 ? (toArray(iso3)) : await getIsoCodes();
 
         // Reduce query time when developing
-        if (test) countryCodes = countryCodes.slice(0, 15);
+        if (test) countryCodes = countryCodes.slice(0, 5);
 
         let countryPromises = countryCodes.map((code: string) => createAlltimeCountryPromise(url, code));
 

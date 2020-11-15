@@ -16,6 +16,8 @@ async function fetchIsoCodes(): Promise<boolean> {
         const relevant: any[] = data.filter(v => +v.relevance >= MIN_RELEVANCE);
         iso3Codes = relevant.map(val => val['cca3']);
 
+        console.log(iso3Codes);
+
         return true
     } catch (err) {
         console.error(err);
