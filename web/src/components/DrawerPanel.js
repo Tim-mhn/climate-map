@@ -1,25 +1,29 @@
 import { CircularProgress, Grid, Typography } from "@material-ui/core";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { PrecipitationHistoryQuery, TemperatureHistoryQuery } from "../graphql/queries/HistoryQueries";
 import { anomToGross, prettyVariable } from "../utils/string";
 import { useGraphQL } from "../hooks/graphql";
-import { VARIABLE_TO_UNIT } from "../utils/constants";
 import { getForecastUnit } from "../utils/features";
 
+const CHART_CANVAS_HEIGHT = "200px";
+let historyChart; // Our chart
 export const DrawerPanel = ({ featuresCollection, clickedFeature, input }) => {
     const historyQuery = input.variable.includes("temperature") ? TemperatureHistoryQuery : PrecipitationHistoryQuery
     const [loading, error, data] = useGraphQL(historyQuery, { iso3: clickedFeature && clickedFeature.properties.ISO_A3 });
 
-    if (loading) console.log(`Loading! ${loading}`)
+
     if (error) console.error(`Error: ${error}`)
+
     useEffect(() => {
-        console.log(clickedFeature)
         const countryFeature = clickedFeature && featuresCollection.features.find(feature => feature.properties.ISO_A3 == clickedFeature.properties.ISO_A3);
-        console.log(countryFeature)
+
         let historyData = [];
         if (data) historyData = data.history.data;
-        console.log(historyData)
-        const ctx = document.getElementById("myChart");
+
+        // Destroying chart before creating new one to avoid glitch with Chartjs (other option: use update())
+        if (typeof historyChart !== "undefined") historyChart.destroy();
+
+        const ctx = document.getElementById("historyChart");
 
         let _data, _labels;
         let _datasets = [];
@@ -45,16 +49,10 @@ export const DrawerPanel = ({ featuresCollection, clickedFeature, input }) => {
                 _datasets.push({ data: _data, label: _scenario, fill: false, borderColor: _scenario == "a2" ? "red" : "green" })
             }
 
-            console.log(_datasets);
         } catch (err) { console.error(err); _data = []; _labels = [] }
 
-        console.info(_datasets)
-        if (_datasets.length > 0) console.log(_datasets)
-
-
-        const myChart = new Chart(ctx, {
+        historyChart = new Chart(ctx, {
             type: "line",
-            height: "200px",
             data: {
                 datasets: _datasets
             },
@@ -68,24 +66,20 @@ export const DrawerPanel = ({ featuresCollection, clickedFeature, input }) => {
                             unit: 'year'
                         }
                     }],
-                    // yAxes: [{
-                    //     ticks: {
-                    //         beginAtZero: true
-                    //     }
-                    // }]
                 }
             }
         });
-        // TODO: Not sure if this line is needed to refresh chart properly 
-        // myChart.update(); 
+
+
+
 
     }, [data]);
 
-    console.log(loading);
 
 
     return <Grid container direction='column' justify='flex-start' alignItems='flex-start' height="280px" style={{ 'padding': '24px' }}>
 
+        {/* Top row: country name */}
         <Grid container item direction='row' justify='flex-start'>
             <Typography>{clickedFeature ? clickedFeature.properties.ADMIN : ''} </Typography>
         </Grid>
@@ -97,9 +91,14 @@ export const DrawerPanel = ({ featuresCollection, clickedFeature, input }) => {
                     <p>{prettyVariable(anomToGross(input.variable))} ({getForecastUnit(anomToGross(input.variable))})</p>
                 </Grid>
                 <Grid container item direction='row' justify="flex-start" alignItems="start">
+
                     {/* Country historical + forecast chart */}
-                    <Grid container item direction='row' justify="flex-start" alignItems="start" style={{ 'visibility': loading ? 'hidden' : '', 'width': (loading) ? '0px' : '1400px' }}>
-                        <canvas id="myChart" height="200px" />
+                    <Grid container item direction='row'
+                        justify="flex-start"
+                        alignItems="start"
+                        style={{ 'visibility': loading ? 'hidden' : '', 'width': (loading) ? '0px' : '1400px' }}>
+
+                        <canvas id="historyChart" height={CHART_CANVAS_HEIGHT} />
 
                     </Grid>
 
@@ -111,15 +110,8 @@ export const DrawerPanel = ({ featuresCollection, clickedFeature, input }) => {
 
 
                 </Grid>
-
-
-
             </Grid>
-
-
-
         </Grid>
-
     </Grid >
 
 }
