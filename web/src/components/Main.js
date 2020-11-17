@@ -45,8 +45,14 @@ export const Main = () => {
 
     // Load GeoJSON data of all countries only on startup
     useEffect(() => {
+
+        console.debug(resolvedQueriesCount);
+
+        
         if (resolvedQueriesCount < 1) { return; }
 
+        console.debug(`Alltime queries responses`)
+        console.debug(alltimeQueriesResp);
 
         let _onLoadUpdate = (updatedFeatures) => {
             Object.entries(alltimeQueriesResp).forEach(([queryName, queryRes]) => {
@@ -56,14 +62,23 @@ export const Main = () => {
                     try {
                         updatedFeatures = updateFeaturesCollection(updatedFeatures, data, queryName);
                         resolvedQueries[queryName] = true
+                        console.debug(resolvedQueries);
+                        console.debug(`${queryName} has been resolved. Data is :`)
+                        console.debug(data);
+                        console.debug("Updated Features is now ...")
+                        console.debug(updatedFeatures);
                         setResolvedQueries(resolvedQueries)
+                        console.debug(resolvedQueries);
+
                     } catch (err) { console.error(err.message) }
                 }
             });
 
+            console.debug('Updating features collection ...')
+            console.debug(updatedFeatures);
             setFeaturesCollection(updatedFeatures);
 
-            if (alltimeQueriesResp[input.variable][2] && !iniColourRender) { console.log("ini colour render true"); setIniColourRender(true); }
+            if (alltimeQueriesResp[input.variable][2] && !iniColourRender) { console.info("Initialization of colour rendering ..."); setIniColourRender(true); }
         }
 
 
