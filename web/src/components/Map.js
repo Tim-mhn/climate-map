@@ -2,20 +2,10 @@ import { useMemo, useState } from "react";
 import ReactMapGL, { Source, Layer } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { MAPBOX_TOKEN } from "../utils/constants";
-import { camelToSentence } from "../utils/string";
-import { getForecastUnit } from "../utils/features";
 import MapTooltip from "./MapTooltip";
-import { InputLeftAddon } from "@chakra-ui/core";
 import theme from "../theme";
 import { DataDrawer } from "./DataDrawer";
 
-const noDataLayer = {
-  id: 'data',
-  type: 'fill',
-  paint: {
-    "fill-color": '#434123'
-  }
-};
 export default function ForecastMap({ featuresCollection, dataLayer, input }) {
   const iniViewport = {
     latitude: 40,
@@ -37,9 +27,7 @@ export default function ForecastMap({ featuresCollection, dataLayer, input }) {
   };
 
   const _onClick = event => {
-    console.info(event)
     const { features } = event;
-    console.info(features)
     const _clickedFeature = features && features.find(f => f.layer.id == 'data');
     setClickedFeature(_clickedFeature)
   }
