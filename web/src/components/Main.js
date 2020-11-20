@@ -14,29 +14,12 @@ import { getDataLayerStops, getForecastValueFromProp, updateFeaturesCollection }
 
 export const Main = () => {
 
-    const useStyles = makeStyles((theme) => ({
-        formControl: {
-            margin: theme.spacing(1),
-            minWidth: 120,
-        },
-        selectEmpty: {
-            marginTop: theme.spacing(2),
-        },
-        root: {
-            minWidth: 100,
-            backgroundColor: "rgba(255, 255, 255, 0.85)"
-        },
-    }));
-
-    const classes = useStyles();
-
-
     const [featuresCollection, setFeaturesCollection] = useState(null);
     const [iniColourRender, setIniColourRender] = useState(false);
     const [input, setInput] = useForm({ fromYear: "2020", scenario: "a2", variable: "temperature", granulation: "year", "month": 0, "relative": false });
 
     // Fetch all time Temperature + Precipitation average and anomaly data
-    const [alltimeQueriesResp, resolvedQueriesCount] = useFetchAll();
+    const alltimeQueriesResp = useFetchAll();
     const [resolvedQueries, setResolvedQueries] = useState({}); // Map of resolved queries to limit featuresCollection update (only update with new data)
 
 
@@ -44,54 +27,17 @@ export const Main = () => {
 
 
     // Load GeoJSON data of all countries only on startup
-    useEffect(() => {
-
-        console.debug(resolvedQueriesCount);
-
-        
-        if (resolvedQueriesCount < 1) { return; }
-
-        console.debug(`Alltime queries responses`)
-        console.debug(alltimeQueriesResp);
-
-        let _onLoadUpdate = (updatedFeatures) => {
-            Object.entries(alltimeQueriesResp).forEach(([queryName, queryRes]) => {
-                const [_, __, data] = queryRes;
-                // Only update if query has been resolved for the first time
-                if (data && !(queryName in resolvedQueries)) {
-                    try {
-                        updatedFeatures = updateFeaturesCollection(updatedFeatures, data, queryName);
-                        resolvedQueries[queryName] = true
-                        console.debug(resolvedQueries);
-                        console.debug(`${queryName} has been resolved. Data is :`)
-                        console.debug(data);
-                        console.debug("Updated Features is now ...")
-                        console.debug(updatedFeatures);
-                        setResolvedQueries(resolvedQueries)
-                        console.debug(resolvedQueries);
-
-                    } catch (err) { console.error(err.message) }
-                }
-            });
-
-            console.debug('Updating features collection ...')
-            console.debug(updatedFeatures);
+    useEffect( () => {
+        getAllGeoJSONs().then(geojsons => {
+            let updatedFeatures = geojsons;
             setFeaturesCollection(updatedFeatures);
+        });
+    }, []);
 
-            if (alltimeQueriesResp[input.variable][2] && !iniColourRender) { console.info("Initialization of colour rendering ..."); setIniColourRender(true); }
-        }
-
-
-        if (!featuresCollection) {
-            getAllGeoJSONs().then(geojsons => {
-                let updatedFeatures = geojsons;
-                _onLoadUpdate(updatedFeatures);
-            });
-        } else {
-            _onLoadUpdate(featuresCollection)
-        }
-
-    }, [resolvedQueriesCount]);
+    useEffect(() => {
+        if (!featuresCollection) { return; }
+        _addResolvedQueriesToFeatures(featuresCollection)
+    }, [alltimeQueriesResp]);
 
     // Update "reference" value for country colouring on scenario update in featuresCollection
     useEffect(() => {
@@ -123,6 +69,27 @@ export const Main = () => {
 
         return dataLayer
     }, [featuresCollection]);
+
+    const _addResolvedQueriesToFeatures = (updatedFeatures) => {
+        updatedFeatures = updatedFeatures ? updatedFeatures : featuresCollection;
+        Object.entries(alltimeQueriesResp).forEach(([queryName, queryResp]) => {
+            const [_, __, data] = queryResp;
+            // Only update if query has been resolved for the first time
+                if (data && !(queryName in resolvedQueries)) {
+                try {
+                    updatedFeatures = updateFeaturesCollection(updatedFeatures, data, queryName);
+                    resolvedQueries[queryName] = true
+                } catch (err) { 
+                    console.error(err.message) 
+                }
+            }
+        });
+
+        setResolvedQueries(resolvedQueries)
+        setFeaturesCollection(updatedFeatures);
+
+        if (alltimeQueriesResp[input.variable][2] && !iniColourRender) setIniColourRender(true); 
+    }
 
 
     const _getRelativeAnom = (featureProperties, input) => {

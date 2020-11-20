@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon --exec ts-node src/index.ts",
-    "build": "tsc",
+    "debug": "node --nolazy ",
     "start": "node ./dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "tsc -w",

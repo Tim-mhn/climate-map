@@ -78,7 +78,10 @@ export class AverageForecastResolver {
         let countryCodes: string[] = iso3 ? (toArray(iso3)) : await getIsoCodes();
 
         // Reduce query time when developing
-        if (test) countryCodes = countryCodes.slice(0, 5);
+        if (test) { 
+            countryCodes = countryCodes.slice(0, 5); 
+            // countryCodes.push("ace");
+        }
 
         let countryPromises = countryCodes.map((code: string) => createAlltimeCountryPromise(url, code));
 
@@ -124,11 +127,13 @@ function createAlltimeCountryPromise(url: string, code: string): Promise<string 
     return Promise.all(countryAlltimePromises)
         .then((countryAlltimeRes: BasicCountryRequestResponse[]) => {
             // Keep only succesful queries responses
-            const successfulRes = countryAlltimeRes.filter(res => res.data);
+            // const successfulRes = countryAlltimeRes.filter(res => res.data);
             // If some queries have worked, return the flattened array of forecasts (res.data)
-            if (successfulRes.length > 0) return arrayFlatten(successfulRes.map(res => res.data));
+            // if (successfulRes.length > 0) return arrayFlatten(successfulRes.map(res => res.data));
             // If all queries have failed, return first error message
-            return countryAlltimeRes[0].error;
+            // return countryAlltimeRes[0].error;
+            console.log(countryAlltimeRes)
+            return arrayFlatten(countryAlltimeRes.map(res => res.data));
 
         })
         .catch((error: Error) => {

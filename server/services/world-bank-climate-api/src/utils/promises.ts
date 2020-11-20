@@ -22,7 +22,6 @@ export function createCountryPromise(url: string, code: string): Promise<BasicCo
    */
   return nodeFetch(`${url}${code}`)
       .then((res: any) => res.json())
-      .catch(err => console.error(err))
       .then((res: ExtendedForecast[])  => {
           return { data: addAnnualVals(res), error: null }
       })
