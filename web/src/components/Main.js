@@ -11,6 +11,7 @@ import InputBoard from './InputBoard';
 import ForecastMap from './Map';
 import { ColourLegend } from './ColourLegend';
 import { getDataLayerStops, getForecastValueFromProp, updateFeaturesCollection } from '../utils/features'
+import CircularStatic from './CircularProgressWithLabel';
 
 export const Main = () => {
 
@@ -21,7 +22,16 @@ export const Main = () => {
     // Fetch all time Temperature + Precipitation average and anomaly data
     const alltimeQueriesResp = useFetchAll();
     const [resolvedQueries, setResolvedQueries] = useState({}); // Map of resolved queries to limit featuresCollection update (only update with new data)
+    const [progress, setProgress] = useState(10);
 
+    React.useEffect(() => {
+      const timer = setInterval(() => {
+        setProgress((prevProgress) => (prevProgress >= 100 ? 10 : prevProgress + 10));
+      }, 800);
+      return () => {
+        clearInterval(timer);
+      };
+    }, []);
 
 
 
@@ -164,8 +174,9 @@ export const Main = () => {
                     </Grid> :
 
                         <Grid id='progress-wrapper' container item direction='row' justify='center' alignItems='center' >
-                            <CircularProgress
+                            <CircularStatic
                                 size={100}
+                                // progress={progress}
                             />
                         </Grid>
 
