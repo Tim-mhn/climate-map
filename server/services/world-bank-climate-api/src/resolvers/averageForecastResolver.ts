@@ -127,13 +127,13 @@ function createAlltimeCountryPromise(url: string, code: string): Promise<string 
     return Promise.all(countryAlltimePromises)
         .then((countryAlltimeRes: BasicCountryRequestResponse[]) => {
             // Keep only succesful queries responses
-            // const successfulRes = countryAlltimeRes.filter(res => res.data);
+            const successfulRes = countryAlltimeRes.filter(res => res.data);
             // If some queries have worked, return the flattened array of forecasts (res.data)
-            // if (successfulRes.length > 0) return arrayFlatten(successfulRes.map(res => res.data));
+            if (successfulRes.length > 0) return arrayFlatten(successfulRes.map(res => res.data));
             // If all queries have failed, return first error message
-            // return countryAlltimeRes[0].error;
-            console.log(countryAlltimeRes)
-            return arrayFlatten(countryAlltimeRes.map(res => res.data));
+            return countryAlltimeRes[0].error;
+            // console.log(countryAlltimeRes)
+            // return arrayFlatten(countryAlltimeRes.map(res => res.data));
 
         })
         .catch((error: Error) => {
