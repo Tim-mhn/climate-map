@@ -1,6 +1,6 @@
-# Front-End built with React, NextJS, MapboxGL, Chart.js
+# Front-End 
 
-## How to use
+To install dependencies and run
 
 ```bash
 npm install
