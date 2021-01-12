@@ -1,11 +1,11 @@
-# climate-map
+# Climate Map
 
 A world map to alert people on climate change consequences. Forecasts per country on various variables and models such as temperature, precipitation, dry days using [World bank Climate Api](https://datahelpdesk.worldbank.org/knowledgebase/articles/902061-climate-data-api)
 
-### Stack :
+![screenshot-map](https://github.com/Tim-mhn/climate-map/blob/main/img/screenshot.png?raw=true)
 
-#### Project Management
-[Trello](https://trello.com/b/Cb7wVbBb/kanban-template)
+
+### Stack :
 
 #### Server:
 [Express](https://expressjs.com/), Typescript, [GraphQL](https://graphql.org/graphql-js/), [Apollo Server](https://www.apollographql.com/docs/apollo-server/)
@@ -15,6 +15,3 @@ React, [Next.js](https://nextjs.org/), [MaterialUI](https://material-ui.com/), [
 
 #### Devops:
 Docker, Dokku, [DigitalOcean](https://www.digitalocean.com/), [Vercel](https://vercel.com/)
-
-
-# [It's live !](https://ourclimate.live) but still wip ...
