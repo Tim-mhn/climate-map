@@ -15,3 +15,25 @@ React, [Next.js](https://nextjs.org/), [MaterialUI](https://material-ui.com/), [
 
 #### Devops:
 Docker, Dokku, [DigitalOcean](https://www.digitalocean.com/), [Vercel](https://vercel.com/)
+
+
+To install dependencies and run projects:
+
+Open 2 terminals:
+
+Terminal 1: (climate web service)
+
+```bash
+cd server/services/world-bank-climate-api
+npm install
+npm run dev
+```
+
+Terminal 2: (front-end)
+```bash
+cd web
+npm install
+npm run dev
+```
+
+
