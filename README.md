@@ -18,7 +18,7 @@ Docker, Dokku, [DigitalOcean](https://www.digitalocean.com/), [Vercel](https://v
 
 
 
-#### To install dependencies and run project:
+### To install dependencies and run project:
 
 Open 2 terminals:
 
