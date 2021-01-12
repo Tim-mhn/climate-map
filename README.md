@@ -17,7 +17,8 @@ React, [Next.js](https://nextjs.org/), [MaterialUI](https://material-ui.com/), [
 Docker, Dokku, [DigitalOcean](https://www.digitalocean.com/), [Vercel](https://vercel.com/)
 
 
-To install dependencies and run projects:
+
+#### To install dependencies and run project:
 
 Open 2 terminals:
 
